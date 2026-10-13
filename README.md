@@ -43,7 +43,9 @@ node dist/serve.mjs                 # gebaute App spielen: http://127.0.0.1:4174
 node --test editor/test/*.test.mjs  # Tests
 ```
 
-Das eigene Projekt liegt in `editor/project/` (nicht versioniert). Aufbau und
+Das eigene Projekt liegt in `editor/project/` und wird mit eingecheckt: Bei jedem
+Push auf `main` baut GitHub Actions daraus die App und veröffentlicht sie auf
+GitHub Pages. Aufbau und
 Plan: [docs/kiteditor/](docs/kiteditor/README.md).
 
 ## Ein eigenes Novel erstellen (Kurzfassung)

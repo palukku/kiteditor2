@@ -39,7 +39,7 @@ plain CSS. No npm packages, no bundler, no framework.
   simple English `//` comments.
 - Novels are never stored as Twee. The editor format in
   [01-project-format.md](01-project-format.md) is the single source of truth.
-- The user's project lives in `editor/project/` (git-ignored). Build output
+- The user's project lives in `editor/project/` and is committed: the Pages workflow builds and publishes it. Build output
   goes to `dist/` (git-ignored).
 - Editor UI language: English. App content language is whatever the user types.
 
@@ -64,7 +64,7 @@ plain CSS. No npm packages, no bundler, no framework.
 
 | What | Command |
 |---|---|
-| Start editor | `node editor/server.mjs` → http://127.0.0.1:4173 |
+| Start editor | `node editor/server.mjs` → http://127.0.0.1:4173 (`HOST=0.0.0.0` to reach it from other machines; no login, trusted networks only) |
 | Tests | `node --test editor/test/*.test.mjs` |
 | Regenerate seed project | `node editor/lib/import-kite.mjs` |
 | Build without UI | `node editor/server.mjs --build` |

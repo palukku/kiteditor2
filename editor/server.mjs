@@ -157,6 +157,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`Built ${files} files → ${options.distDir}\nPlay it: node dist/serve.mjs`);
   } else {
     const port = Number(process.env.PORT) || 4173;
-    createServer(options).listen(port, "127.0.0.1", () => console.log(`KITEditor running at http://127.0.0.1:${port}`));
+    // Local only by default: the API can write files and has no login.
+    // HOST=0.0.0.0 opens it to the network (e.g. to reach a VM from its host).
+    const host = process.env.HOST || "127.0.0.1";
+    createServer(options).listen(port, host, () => console.log(`KITEditor running at http://${host}:${port}`));
   }
 }

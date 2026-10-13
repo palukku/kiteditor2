@@ -39,25 +39,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Copy all assets to public
-        run: |
-          mkdir -p public
-          # Copy entire app directory
-          cp -r ./app/* public/
-          # Copy root assets (images, etc.)
-          if [ -d ./assets ]; then cp -r ./assets/* public/; fi
-          # Copy root files
-          if [ -f ./style.css ]; then cp ./style.css public/; fi
-          if [ -d ./server/public ]; then cp -r ./server/public/* public/; fi
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-      - name: Verify files
-        run: |
-          ls -R public/
+      # Builds the app as configured in the KITEditor (editor/project/),
+      # or the unchanged KITE app when no project is checked in.
+      - name: Build white-label app
+        run: node editor/server.mjs --build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: dist
 
       - name: Deploy to GitHub Pages
         id: deployment

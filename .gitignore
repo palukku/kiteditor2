@@ -12,5 +12,4 @@ public/
 
 # Python bytecode cache
 __pycache__/
-editor/project/
 dist/
