@@ -63,6 +63,23 @@ class LoadingScene extends HTMLElement {
    */
   async proceedToNextScene() {
     await loadMappings().catch(() => {});
+
+    // Editor preview: "?novel=<name>" jumps straight into that novel
+    const previewName = new URLSearchParams(location.search).get("novel");
+    if (previewName) {
+      const data = await fetchFromJson("assets/json/novels.json").catch(() => null);
+      const novel = data?.visualNovels?.find((n) => n.name === previewName);
+      if (novel) {
+        this.dispatchEvent(
+          new CustomEvent("sm-switch-scene", {
+            detail: { scene: "novel-scene", args: { novel, needBaseHeader: false } },
+            bubbles: true,
+          }),
+        );
+        return;
+      }
+    }
+
     this.dispatchEvent(
       new CustomEvent("sm-switch-scene", {
         detail: { scene: TermsConsentScene.hasLegalConsentCached() ? "start-scene" : "terms-consent-scene"},

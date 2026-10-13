@@ -104,9 +104,15 @@ export function compileNovel(novel) {
   };
 }
 
+// The novel played after the start button: the flagged one, else the first.
+export function introOf(project) {
+  const novels = project.novels ?? [];
+  return novels.find((n) => n.intro) ?? novels[0];
+}
+
 export function compileProject(project) {
   const novels = project.novels ?? [];
-  const intro = novels.find((n) => n.intro) ?? novels[0] ?? { nodes: [], title: "" };
+  const intro = introOf(project) ?? { nodes: [], title: "" };
   const rest = novels.filter((n) => n !== intro);
   return {
     visualNovels: [
