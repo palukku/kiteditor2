@@ -3,6 +3,8 @@ name: GitHub Pages
 on:
   push:
     branches: [ main, master ]
+  # Allows starting a deploy by hand in the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
