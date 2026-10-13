@@ -45,6 +45,11 @@ node --test editor/test/*.test.mjs  # Tests
 
 Lokal liegt das eigene Projekt in `editor/project/` (nicht versioniert).
 
+**Direkt in der App bearbeiten:** Rechtsklick auf einen Text, ein Logo, einen
+Hintergrund oder eine Novel in der Vorschau öffnet ein Menü zum Bearbeiten,
+Ersetzen oder Löschen; in der Novel-Auswahl gibt es eine Kachel „＋ Novelle
+hinzufügen“. Text- und Bildänderungen erscheinen sofort in der laufenden App.
+
 **Online-Editor:** Bei jedem Push auf `main` veröffentlicht GitHub Actions den
 Editor selbst auf GitHub Pages (`node editor/server.mjs --site` erzeugt die
 statische Seite in `site/`). Dort läuft alles im Browser: Das Projekt wird im

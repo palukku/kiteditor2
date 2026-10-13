@@ -1,5 +1,6 @@
 import { getProject, getMeta, saveProject, buildApp, projectFileActions } from "./api-service.js";
 import { h } from "./dom-service.js";
+import { PreviewInspector } from "./preview-inspector-handler.js";
 import "./branding-panel-component.js";
 import "./novel-list-component.js";
 import "./novel-editor-component.js";
@@ -26,6 +27,7 @@ class EditorMain extends HTMLElement {
     }
     this.selectedNovel = this.project.novels[0] ?? null;
     this.renderShell();
+    this.inspector = new PreviewInspector(this);
 
     this.addEventListener("project-change", (event) => this.scheduleSave(event.detail.preview));
     this.addEventListener("novel-select", (event) => this.selectNovel(event.detail.novel));
@@ -73,7 +75,10 @@ class EditorMain extends HTMLElement {
       this.warnings,
       h("main", { class: "columns" },
         h("aside", { class: "panel left" }, h("nav", { class: "tabs" }, this.tabs), this.branding, this.novelList),
-        h("section", { class: "stage" }, this.preview),
+        h("section", { class: "stage" },
+          this.preview,
+          h("p", { class: "stage-hint" }, "Right-click anything in the app to edit it: texts, logos, backgrounds, novels."),
+        ),
         h("section", { class: "panel right" }, this.novelEditor),
       ),
     );
@@ -90,6 +95,13 @@ class EditorMain extends HTMLElement {
     this.novelList.selected = novel;
     this.novelList.render();
     this.novelEditor.novel = novel;
+    this.novelEditor.render();
+  }
+
+  // Redraws the side panels after the project was changed from inside the preview
+  refreshPanels() {
+    this.branding.render();
+    this.novelList.render();
     this.novelEditor.render();
   }
 
@@ -124,8 +136,11 @@ class EditorMain extends HTMLElement {
       this.status.textContent = "saved ✓";
       this.showWarnings(warnings);
       if (preview) {
-        this.reloadPreview();
+        // Colors, images and content need a reload; the inspector returns to the same screen
+        this.inspector.softReload();
         this.branding.refreshThumbnails();
+      } else {
+        await this.inspector.refreshNovels();
       }
     } catch (error) {
       this.status.textContent = `save failed: ${error.message}`;

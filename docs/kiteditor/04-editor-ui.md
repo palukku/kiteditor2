@@ -28,6 +28,25 @@ CSS grid `320px auto 1fr`, full viewport height. The phone iframe keeps
 aspect ratio 1:2 at full available height. Warnings from the last save are
 listed under the top bar.
 
+## Editing inside the preview
+
+`preview-inspector-handler.js` (`PreviewInspector`, created by `editor-main`)
+attaches to the iframe document from outside on every load:
+
+- **Right-click** builds a menu from what is under the pointer: a text whose
+  content matches a text slot, a novel title/description, a dialogue line, an
+  answer or a string in a content file (`findSource`); an `<img>` or CSS
+  background that belongs to an image slot; a novel tile in the selection; the
+  background of the novel being played.
+- **Edit text** opens a text field over the text; typing changes the app's DOM
+  immediately, Enter/blur saves, Escape reverts.
+- **Novel selection** gets an extra “＋ Novelle hinzufügen” tile; tiles offer
+  edit, rename, play, delete.
+- Live updates: texts and `<img>` slots are changed in place; novel changes
+  are pushed into the running app (`refreshNovels` sets `window.novelsCache`
+  and redraws the selection); colors and CSS backgrounds need `softReload()`,
+  which reloads and reopens the same scene.
+
 ## Shared state contract
 
 `<editor-main>` owns `this.project` and `this.meta`. Children receive them via
