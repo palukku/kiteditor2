@@ -50,7 +50,7 @@ Read [README.md](README.md) and [01-project-format.md](01-project-format.md) fir
   - `validateProject reports duplicate names` and names not matching
     `^[A-Za-z0-9_-]+$`.
 
-- [ ] **Step 2:** Run `node --test editor/test/compile.test.mjs` → FAIL (module missing).
+- [ ] **Step 2:** Run `node --test editor/test/*.test.mjscompile.test.mjs` → FAIL (module missing).
 
 - [ ] **Step 3: Implement `editor/lib/compile.mjs`.**
   Approach: build `Map id → node`; `resolve(id)` follows empty `next` nodes
@@ -112,5 +112,5 @@ Node `id` and `label` = the head event's id. `nextNodeNumber: 1`.
 
 - [ ] **Step 2:** Run → FAIL.
 - [ ] **Step 3:** Implement; run the CLI to generate `editor/default-project.json`.
-- [ ] **Step 4:** Run `node --test editor/test/` → PASS.
+- [ ] **Step 4:** Run `node --test editor/test/*.test.mjs` → PASS.
 - [ ] **Step 5:** Commit `feat(editor): import existing KITE novels as seed project`.

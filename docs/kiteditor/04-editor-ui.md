@@ -91,7 +91,7 @@ strings emptied; hidden when the array is empty); objects → labelled fields.
   start button text is visible after the automatic preview reload; uploading a
   logo replaces it on the start screen; *Reset* restores it; *Build app*
   reports success and *Open built app* shows the same result.
-- [ ] **Step 3:** `node --test editor/test/` still passes.
+- [ ] **Step 3:** `node --test editor/test/*.test.mjs` still passes.
 - [ ] **Step 4:** Commit `feat(editor): editor shell and branding panel`.
 
 ### Task 6: Novel list + novel editor

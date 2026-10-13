@@ -133,7 +133,7 @@ slot is never inside raw HTML outside a JS file.)
 
 - [ ] **Step 2:** Run → FAIL.
 - [ ] **Step 3:** Implement the three modules.
-- [ ] **Step 4:** Run `node --test editor/test/` → PASS.
+- [ ] **Step 4:** Run `node --test editor/test/*.test.mjs` → PASS.
 - [ ] **Step 5:** Commit `feat(editor): white-label overlay and build`.
 
 ### Task 4: Server + preview hook
@@ -197,6 +197,6 @@ of the start/consent scene. Unknown name → normal flow.
 
 - [ ] **Step 2:** Run → FAIL.
 - [ ] **Step 3:** Implement server and the preview hook.
-- [ ] **Step 4:** Run `node --test editor/test/` → PASS. Manually:
+- [ ] **Step 4:** Run `node --test editor/test/*.test.mjs` → PASS. Manually:
   `node editor/server.mjs`, open `/preview/index.html` → KITE app loads.
 - [ ] **Step 5:** Commit `feat(editor): local server with live preview and build`.

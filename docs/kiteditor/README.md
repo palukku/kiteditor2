@@ -64,7 +64,7 @@ plain CSS. No npm packages, no bundler, no framework.
 | What | Command |
 |---|---|
 | Start editor | `node editor/server.mjs` → http://127.0.0.1:4173 |
-| Tests | `node --test editor/test/` |
+| Tests | `node --test editor/test/*.test.mjs` |
 | Regenerate seed project | `node editor/lib/import-kite.mjs` |
 | Build without UI | `node editor/server.mjs --build` |
 | Play a build | `node dist/serve.mjs` → http://127.0.0.1:4174 |
