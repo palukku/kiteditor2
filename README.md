@@ -43,9 +43,14 @@ node dist/serve.mjs                 # gebaute App spielen: http://127.0.0.1:4174
 node --test editor/test/*.test.mjs  # Tests
 ```
 
-Das eigene Projekt liegt in `editor/project/` und wird mit eingecheckt: Bei jedem
-Push auf `main` baut GitHub Actions daraus die App und veröffentlicht sie auf
-GitHub Pages. Aufbau und
+Lokal liegt das eigene Projekt in `editor/project/` (nicht versioniert).
+
+**Online-Editor:** Bei jedem Push auf `main` veröffentlicht GitHub Actions den
+Editor selbst auf GitHub Pages (`node editor/server.mjs --site` erzeugt die
+statische Seite in `site/`). Dort läuft alles im Browser: Das Projekt wird im
+Browser-Speicher des jeweiligen Geräts abgelegt (Sicherung über „Export
+project“ / „Import project“), „Build app“ lädt die fertige App als ZIP herunter.
+Der Online-Editor braucht eine `https://`-Adresse (Service Worker). Aufbau und
 Plan: [docs/kiteditor/](docs/kiteditor/README.md).
 
 ## Ein eigenes Novel erstellen (Kurzfassung)

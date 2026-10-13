@@ -38,7 +38,7 @@ class BrandingPanel extends HTMLElement {
   }
 
   renderImage(slot) {
-    const thumb = h("img", { class: "thumb", alt: "", src: `/preview/${slot.path}?t=${Date.now()}` });
+    const thumb = h("img", { class: "thumb", alt: "", src: `preview/${slot.path}?t=${Date.now()}` });
     this.thumbs.push({ thumb, slot });
     const upload = async (event) => {
       const file = event.target.files[0];
@@ -66,7 +66,7 @@ class BrandingPanel extends HTMLElement {
 
   // Called by editor-main after each save: thumbnails show the saved project
   refreshThumbnails() {
-    for (const { thumb, slot } of this.thumbs) thumb.src = `/preview/${slot.path}?t=${Date.now()}`;
+    for (const { thumb, slot } of this.thumbs) thumb.src = `preview/${slot.path}?t=${Date.now()}`;
   }
 
   renderColor(slot) {

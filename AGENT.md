@@ -28,9 +28,11 @@ KITEditor is the local white-label configurator around the app. Plan and format:
 - The editor UI uses plain CSS (`editor/ui/editor.css`), NOT Tailwind. Do not add Tailwind classes to `app/` for editor features.
 - Never build HTML from user text; use the `h()` helper in `editor/ui/src/dom-service.js`.
 - White-labelling never edits `app/`: `editor/lib/overlay.mjs` replaces files/strings on the fly for preview and build. New configurable things go into `editor/lib/slots.mjs`.
+- Two backends behind `editor/ui/src/api-service.js`: the local server (`editor/server.mjs`, project on disk) and the browser (`browser-backend-service.js` + `sw.js`, project in IndexedDB, build as zip). Shared logic must stay free of Node imports: `lib/compile.mjs`, `lib/overlay-core.mjs`, `lib/zip.mjs`. All UI URLs are relative (the site runs under a sub-path).
 - Novels are stored in the editor's node format and compiled by `editor/lib/compile.mjs`. No Twee.
 - Commands:
     - Start: `node editor/server.mjs` (http://127.0.0.1:4173)
     - Tests: `node --test editor/test/*.test.mjs`
     - Build without UI: `node editor/server.mjs --build`, play it with `node dist/serve.mjs`
+    - Browser-only editor for static hosting (GitHub Pages): `node editor/server.mjs --site` writes `site/`
     - Regenerate the seed project after changing `app/assets/json/novels.json`: `node editor/lib/import-kite.mjs`

@@ -87,3 +87,31 @@ export function textSlots() {
   cache = slots;
   return slots;
 }
+
+// All files of the app, relative to app/ with forward slashes
+export function appFiles() {
+  return fs
+    .readdirSync(APP_DIR, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.relative(APP_DIR, path.join(entry.parentPath, entry.name)).split(path.sep).join("/"));
+}
+
+// Everything the editor UI needs to know about the app (served as /api/meta,
+// or written to meta.json for the browser-only editor)
+export function loadMeta() {
+  const lines = (rel) => readApp(rel).split(/\r?\n/).filter((line) => line.includes(":"));
+  return {
+    imageSlots: IMAGE_SLOTS,
+    colorSlots: COLOR_SLOTS,
+    textSlots: textSlots(),
+    contentFiles: CONTENT_FILES,
+    characters: JSON.parse(readApp("assets/json/character-info.json")).characters.filter((c) => c.id !== 0),
+    expressions: lines("assets/mappings/face-expressions.txt").map((line) => {
+      const [name, id] = line.split(":");
+      return { id: Number(id), name: name.trim() };
+    }),
+    sounds: fs.readdirSync(path.join(APP_DIR, "assets/AudioResources")).map((f) => path.parse(f).name).sort(),
+    biases: lines("assets/mappings/biases.txt").map((line) => line.slice(line.indexOf(":") + 1).trim()),
+    content: Object.fromEntries(CONTENT_FILES.map((c) => [c.path, JSON.parse(readApp(c.path))])),
+  };
+}

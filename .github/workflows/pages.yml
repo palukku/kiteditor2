@@ -46,15 +46,15 @@ jobs:
         with:
           node-version: 22
 
-      # Builds the app as configured in the KITEditor (editor/project/),
-      # or the unchanged KITE app when no project is checked in.
-      - name: Build white-label app
-        run: node editor/server.mjs --build
+      # Publishes the KITEditor itself as a static site: it runs completely in
+      # the visitor's browser (project in browser storage, build as zip download).
+      - name: Build browser-only editor
+        run: node editor/server.mjs --site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment

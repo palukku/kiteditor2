@@ -63,12 +63,12 @@ editor-main { display: flex; flex-direction: column; height: 100vh; }
 
 /* ---------- controls ---------- */
 
-button {
+button, label.button {
   font: inherit; color: var(--text);
   padding: 6px 12px; border: 1px solid var(--line); border-radius: var(--radius);
   background: #fff; cursor: pointer;
 }
-button:hover:not(:disabled) { border-color: var(--brand); }
+button:hover:not(:disabled), label.button:hover { border-color: var(--brand); }
 button:disabled { opacity: 0.35; cursor: default; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .graph-node:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 1px;

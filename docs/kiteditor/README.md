@@ -39,7 +39,7 @@ plain CSS. No npm packages, no bundler, no framework.
   simple English `//` comments.
 - Novels are never stored as Twee. The editor format in
   [01-project-format.md](01-project-format.md) is the single source of truth.
-- The user's project lives in `editor/project/` and is committed: the Pages workflow builds and publishes it. Build output
+- The user's project lives in `editor/project/` (git-ignored) with the local server, or in the browser's IndexedDB in the browser-only editor. Build output
   goes to `dist/` (git-ignored).
 - Editor UI language: English. App content language is whatever the user types.
 
@@ -50,7 +50,11 @@ plain CSS. No npm packages, no bundler, no framework.
 | `editor/lib/compile.mjs` | `compileNovel`, `compileProject`, `validateNovel` — editor novel → app events |
 | `editor/lib/import-kite.mjs` | `decompileNovel`, `importKite` — existing `novels.json` → editor novels; CLI writes `editor/default-project.json` |
 | `editor/lib/slots.mjs` | `IMAGE_SLOTS`, `COLOR_SLOTS`, `textSlots()`, `CONTENT_FILES` — what is configurable and where it lives in `app/` |
-| `editor/lib/overlay.mjs` | `resolveFile`, `extraPaths`, `build` — white-labelling of single files and whole build |
+| `editor/lib/overlay-core.mjs` | `createOverlay(slots, io)` — the white-label rules, free of Node/DOM so server and browser share them |
+| `editor/lib/overlay.mjs` | Node wrapper: `resolveFile`, `extraPaths`, `build` (all async) reading from disk |
+| `editor/lib/zip.mjs` | `zipParts`, `crc32` — store-only zip writer for the browser build download |
+| `editor/lib/site.mjs` | `buildSite(outDir)` — the browser-only editor as a static folder (GitHub Pages) |
+| `editor/ui/sw.js`, `ui/src/browser-backend-service.js` | Browser backend: service worker relays `preview/*` to the page; project in IndexedDB; export/import |
 | `editor/lib/serve-static.mjs` | `sendFile`, standalone static server (copied into `dist/` as `serve.mjs`) |
 | `editor/server.mjs` | HTTP routes: editor UI, `/preview/`, `/dist/`, `/api/*` |
 | `editor/default-project.json` | Generated seed project = the real KITE app |
@@ -68,6 +72,7 @@ plain CSS. No npm packages, no bundler, no framework.
 | Tests | `node --test editor/test/*.test.mjs` |
 | Regenerate seed project | `node editor/lib/import-kite.mjs` |
 | Build without UI | `node editor/server.mjs --build` |
+| Browser-only editor (static site) | `node editor/server.mjs --site` → `site/`, deployed by `.github/workflows/pages.yml` |
 | Play a build | `node dist/serve.mjs` → http://127.0.0.1:4174 |
 
 ## Tasks

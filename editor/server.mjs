@@ -7,7 +7,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateProject } from "./lib/compile.mjs";
 import { resolveFile, build } from "./lib/overlay.mjs";
-import { APP_DIR, IMAGE_SLOTS, COLOR_SLOTS, CONTENT_FILES, textSlots } from "./lib/slots.mjs";
+import { APP_DIR, loadMeta } from "./lib/slots.mjs";
+import { buildSite } from "./lib/site.mjs";
 import { safeJoin, sendFile } from "./lib/serve-static.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -37,25 +38,6 @@ function readBody(req) {
     req.on("end", () => resolve(Buffer.concat(chunks)));
     req.on("error", reject);
   });
-}
-
-function loadMeta() {
-  const read = (rel) => fs.readFileSync(path.join(APP_DIR, rel), "utf8");
-  const lines = (rel) => read(rel).split(/\r?\n/).filter((line) => line.includes(":"));
-  return {
-    imageSlots: IMAGE_SLOTS,
-    colorSlots: COLOR_SLOTS,
-    textSlots: textSlots(),
-    contentFiles: CONTENT_FILES,
-    characters: JSON.parse(read("assets/json/character-info.json")).characters.filter((c) => c.id !== 0),
-    expressions: lines("assets/mappings/face-expressions.txt").map((line) => {
-      const [name, id] = line.split(":");
-      return { id: Number(id), name: name.trim() };
-    }),
-    sounds: fs.readdirSync(path.join(APP_DIR, "assets/AudioResources")).map((f) => path.parse(f).name).sort(),
-    biases: lines("assets/mappings/biases.txt").map((line) => line.slice(line.indexOf(":") + 1).trim()),
-    content: Object.fromEntries(CONTENT_FILES.map((c) => [c.path, JSON.parse(read(c.path))])),
-  };
 }
 
 export function createServer({ projectDir, distDir }) {
@@ -102,7 +84,7 @@ export function createServer({ projectDir, distDir }) {
     if (urlPath === "/api/meta" && req.method === "GET") return json(res, 200, (meta ??= loadMeta()));
 
     if (urlPath === "/api/build" && req.method === "POST") {
-      return json(res, 200, { ...build(getProject(), projectDir, distDir), dir: distDir });
+      return json(res, 200, { ...(await build(getProject(), projectDir, distDir)), dir: distDir, url: `dist/index.html?t=${Date.now()}` });
     }
 
     const assetName = under("/api/asset/");
@@ -127,7 +109,7 @@ export function createServer({ projectDir, distDir }) {
       const file = safeJoin(APP_DIR, previewRel);
       if (!file) return json(res, 400, { error: "invalid path" });
       const rel = path.relative(APP_DIR, file).split(path.sep).join("/");
-      return sendFile(res, file, resolveFile(getProject(), projectDir, rel));
+      return sendFile(res, file, await resolveFile(getProject(), projectDir, rel));
     }
 
     const distRel = under("/dist/");
@@ -153,8 +135,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (process.argv.includes("--build")) {
     const projectFile = path.join(options.projectDir, "project.json");
     const project = JSON.parse(fs.readFileSync(fs.existsSync(projectFile) ? projectFile : DEFAULT_PROJECT, "utf8"));
-    const { files } = build(project, options.projectDir, options.distDir);
+    const { files } = await build(project, options.projectDir, options.distDir);
     console.log(`Built ${files} files → ${options.distDir}\nPlay it: node dist/serve.mjs`);
+  } else if (process.argv.includes("--site")) {
+    const siteDir = path.resolve(HERE, "../site");
+    console.log(`Wrote the browser-only editor (${buildSite(siteDir).files} files) → ${siteDir}`);
   } else {
     const port = Number(process.env.PORT) || 4173;
     // Local only by default: the API can write files and has no login.
