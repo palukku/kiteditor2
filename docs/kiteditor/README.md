@@ -29,7 +29,7 @@ plain CSS. No npm packages, no bundler, no framework.
 - No dependencies: nothing may be added to `package.json`; no CDN URLs; no
   `npm install` needed to run editor, tests or build.
 - Works offline. The server binds to `127.0.0.1` only.
-- Editor UI uses plain CSS in `editor/public/editor.css` (not Tailwind — the
+- Editor UI uses plain CSS in `editor/ui/editor.css` (not Tailwind — the
   Tailwind CLI is an npm dependency and is not installed).
 - `app/` stays a working standalone KITE app. Do **not** add Tailwind classes
   to `app/` (the generated `app/tailwind.css` cannot be rebuilt offline).
@@ -54,8 +54,9 @@ plain CSS. No npm packages, no bundler, no framework.
 | `editor/lib/serve-static.mjs` | `sendFile`, standalone static server (copied into `dist/` as `serve.mjs`) |
 | `editor/server.mjs` | HTTP routes: editor UI, `/preview/`, `/dist/`, `/api/*` |
 | `editor/default-project.json` | Generated seed project = the real KITE app |
-| `editor/public/index.html`, `editor.css` | Editor shell and styles |
-| `editor/public/src/*.js` | Editor Custom Elements (see [04-editor-ui.md](04-editor-ui.md)) |
+| `editor/ui/index.html`, `editor.css` | Editor shell and styles |
+| `editor/ui/src/*.js` | Editor Custom Elements (see [04-editor-ui.md](04-editor-ui.md)); `dom-service.js` holds the `h()` element helper |
+| `editor/package.json` | Only `{ "type": "module" }` so Node can import the browser modules in tests |
 | `editor/test/*.test.mjs` | `node --test` suites |
 | `app/src/scenes/loading-scene/loading-scene.js` | `?novel=` preview hook |
 

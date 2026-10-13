@@ -153,7 +153,7 @@ slot is never inside raw HTML outside a JS file.)
 
 | Route | Behaviour |
 |---|---|
-| `GET /` and `GET /<file>` | files from `editor/public/` |
+| `GET /` and `GET /<file>` | files from `editor/ui/` |
 | `GET /preview/<rel>` | `resolveFile(...)` or the app file |
 | `GET /dist/<rel>` | file from `distDir` |
 | `GET /api/project` | project JSON (seeded from default on first use) |

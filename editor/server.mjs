@@ -11,7 +11,7 @@ import { APP_DIR, IMAGE_SLOTS, COLOR_SLOTS, CONTENT_FILES, textSlots } from "./l
 import { safeJoin, sendFile } from "./lib/serve-static.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DIR = path.join(HERE, "public");
+const PUBLIC_DIR = path.join(HERE, "ui");
 const DEFAULT_PROJECT = path.join(HERE, "default-project.json");
 const MAX_BODY = 20 * 1024 * 1024;
 const ASSET_NAME = /^[A-Za-z0-9_-][A-Za-z0-9._-]*$/;

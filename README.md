@@ -29,6 +29,23 @@ npx @tailwindcss/cli -i ./style.css -o ./app/tailwind.css
 #    und app/index.html im Browser öffnen
 ```
 
+## KITEditor (White-Label-Konfigurator)
+
+Mit dem KITEditor lässt sich die App ohne Programmierkenntnisse anpassen: Die
+echte KITE-App läuft in der Mitte, drumherum werden Logos, Farben, Texte und
+Novels bearbeitet. Novels entstehen in einem eigenen Knoten-Editor (kein Twee).
+Der Editor läuft lokal und offline und braucht nur Node.js – kein `npm install`.
+
+```bash
+node editor/server.mjs              # Editor starten: http://127.0.0.1:4173
+node editor/server.mjs --build      # App ohne Oberfläche nach dist/ bauen
+node dist/serve.mjs                 # gebaute App spielen: http://127.0.0.1:4174
+node --test editor/test/*.test.mjs  # Tests
+```
+
+Das eigene Projekt liegt in `editor/project/` (nicht versioniert). Aufbau und
+Plan: [docs/kiteditor/](docs/kiteditor/README.md).
+
 ## Ein eigenes Novel erstellen (Kurzfassung)
 
 1. Twee-Dateien `visual_novel_meta_data.txt` und `visual_novel_event_list.txt` anlegen

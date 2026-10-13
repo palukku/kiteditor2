@@ -4,7 +4,7 @@ Read [README.md](README.md) and [01-project-format.md](01-project-format.md)
 first. The HTTP API is specified in
 [03-overlay-server-build.md](03-overlay-server-build.md), Task 4.
 
-All files live in `editor/public/`. Vanilla ES modules, Custom Elements in
+All files live in `editor/ui/`. Vanilla ES modules, Custom Elements in
 light DOM, plain CSS classes from `editor.css`. Never build HTML from user text
 with string concatenation: set `textContent` / `value`.
 
@@ -49,8 +49,8 @@ presses ▶ Play).
 ### Task 5: Editor shell + branding panel
 
 **Files:**
-- Create: `editor/public/index.html`, `editor/public/editor.css`
-- Create: `editor/public/src/editor-main.js`, `api-service.js`,
+- Create: `editor/ui/index.html`, `editor/ui/editor.css`
+- Create: `editor/ui/src/editor-main.js`, `api-service.js`,
   `branding-panel-component.js`, `json-form-component.js`
 
 **Interfaces:**
@@ -97,7 +97,7 @@ strings emptied; hidden when the array is empty); objects → labelled fields.
 ### Task 6: Novel list + novel editor
 
 **Files:**
-- Create: `editor/public/src/novel-list-component.js`,
+- Create: `editor/ui/src/novel-list-component.js`,
   `novel-editor-component.js`, `novel-graph-component.js`,
   `node-form-component.js`, `novel-model-service.js`
 - Test: `editor/test/novel-model.test.mjs` (the service is DOM-free and is
