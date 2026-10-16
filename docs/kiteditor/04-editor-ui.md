@@ -32,8 +32,7 @@ of a code editor. Folders are only folders; a click on an item emits
 `GENERAL_ITEMS` lists which image, color, text and content slots each General
 item shows and the app scene the preview opens (`scene`); every slot belongs
 to exactly one item. Selecting a novel starts it in the preview. Novels are
-reordered by
-drag and drop or with ↑/↓.
+reordered by drag and drop or with ↑/↓.
 
 CSS grid `280px auto 1fr`, full viewport height. The phone iframe keeps
 aspect ratio 1:2 at full available height. Warnings from the last save are
