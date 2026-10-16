@@ -9,6 +9,8 @@ const HEX_X_STEP = 380;
 const HEX_Y = [-288, -102];
 const HEX_PATH = "M 96.5,0 L 209.5,0 Q 229.5,0 239.5,17.3 L 296,115.7 Q 306,133 296,150.3 L 239.5,248.7 Q 229.5,266 209.5,266 L 96.5,266 Q 76.5,266 66.5,248.7 L 10,150.3 Q 0,133 10,115.7 L 66.5,17.3 Q 76.5,0 96.5,0 Z";
 const TEXT_PARENT_LEVELS = 4;
+// Same as TAP_MOVE_THRESHOLD_PX in the app's tap-service.js
+const TAP_MOVE_PX = 10;
 
 const norm = (text) => String(text ?? "").replace(/\s+/g, " ").trim();
 
@@ -31,6 +33,8 @@ export class PreviewInspector {
   constructor(editor) {
     this.editor = editor;
     this.restoreScene = null;
+    // true while a General item is selected: the app only scrolls and opens external links
+    this.readOnly = false;
     this.menu = h("div", { class: "context-menu", hidden: true });
     this.filePicker = h("input", { type: "file", accept: "image/*", hidden: true });
     editor.append(this.menu, this.filePicker);
@@ -77,8 +81,33 @@ export class PreviewInspector {
     doc.kiteditorAttached = true;
     doc.addEventListener("contextmenu", (event) => this.onContextMenu(event), true);
     doc.addEventListener("pointerdown", () => this.closeMenu(), true);
+    this.blockInteraction(doc.defaultView);
     new MutationObserver(() => this.decorate()).observe(doc.documentElement, { childList: true, subtree: true });
     this.decorate();
+  }
+
+  // Read-only mode: swallows taps, clicks and typing before the app sees them.
+  // Registered on the window in the capture phase, so it runs before every app
+  // listener. Drags (scrolling, panning) and right-clicks pass through.
+  blockInteraction(win) {
+    let down = null;
+    const allowed = (event) => {
+      const link = event.target.closest?.("a[href]");
+      const external = link && new URL(link.href, win.location.href).origin !== win.location.origin;
+      return !this.readOnly || external || event.target.closest?.(".kiteditor-add");
+    };
+    const block = (event) => {
+      if (allowed(event)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    };
+    win.addEventListener("pointerdown", (event) => { down = event; }, true);
+    // A pointerup without movement is a tap (tap-service.js); after a drag it must pass to end the drag
+    win.addEventListener("pointerup", (event) => {
+      if (down && Math.hypot(event.clientX - down.clientX, event.clientY - down.clientY) <= TAP_MOVE_PX) block(event);
+    }, true);
+    for (const type of ["click", "dblclick", "submit", "beforeinput"]) win.addEventListener(type, block, true);
+    win.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") block(event); }, true);
   }
 
   // Runs whenever the app changes its DOM

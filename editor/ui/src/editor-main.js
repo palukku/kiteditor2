@@ -75,7 +75,7 @@ class EditorMain extends HTMLElement {
         h("aside", { class: "panel left" }, this.tree),
         h("section", { class: "stage" },
           this.preview,
-          h("p", { class: "stage-hint" }, "Right-click anything in the app to edit it: texts, logos, backgrounds, novels."),
+          this.stageHint = h("p", { class: "stage-hint" }),
         ),
         h("section", { class: "panel right" }, this.branding, this.novelEditor),
       ),
@@ -87,6 +87,7 @@ class EditorMain extends HTMLElement {
     this.branding.item = item;
     this.branding.render();
     this.showInTree(item, this.branding);
+    this.setReadOnly(true);
     this.inspector.showScene(item.scene);
   }
 
@@ -95,7 +96,16 @@ class EditorMain extends HTMLElement {
     this.novelEditor.novel = novel;
     this.novelEditor.render();
     this.showInTree(novel, this.novelEditor);
+    this.setReadOnly(false);
     if (novel) this.inspector.showNovel(novel);
+  }
+
+  // General items show their screen read-only; novels can be played
+  setReadOnly(readOnly) {
+    this.inspector.readOnly = readOnly;
+    this.stageHint.textContent = readOnly
+      ? "Preview only: scrolling and external links work. Right-click anything to edit it."
+      : "Right-click anything in the app to edit it: texts, logos, backgrounds, novels.";
   }
 
   showInTree(selected, view) {

@@ -31,7 +31,10 @@ of a code editor. Folders are only folders; a click on an item emits
 `<branding-panel>` with that `item` or `<novel-editor>` on the right.
 `GENERAL_ITEMS` lists which image, color, text and content slots each General
 item shows and the app scene the preview opens (`scene`); every slot belongs
-to exactly one item. Selecting a novel starts it in the preview. Novels are
+to exactly one item. While a General item is selected the preview is
+read-only (`PreviewInspector.readOnly`): taps, clicks and typing are swallowed,
+scrolling, dragging, external links and right-click editing still work.
+Selecting a novel starts it in the preview and makes it playable. Novels are
 reordered by drag and drop or with ↑/↓.
 
 CSS grid `280px auto 1fr`, full viewport height. The phone iframe keeps
