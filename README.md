@@ -45,6 +45,11 @@ node --test editor/test/*.test.mjs  # Tests
 
 Lokal liegt das eigene Projekt in `editor/project/` (nicht versioniert).
 
+**Navigationsbaum:** Links steht ein Baum wie in VS Code – Ordner „General“
+(Startbildschirm, Links, Wiki, Impressum, Datenschutz, …) und „Novels“. Ein
+Klick auf einen Eintrag öffnet rechts dessen Bearbeitungsansicht; Novels lassen
+sich per Drag & Drop oder mit ↑/↓ umsortieren.
+
 **Direkt in der App bearbeiten:** Rechtsklick auf einen Text, ein Logo, einen
 Hintergrund oder eine Novel in der Vorschau öffnet ein Menü zum Bearbeiten,
 Ersetzen oder Löschen; in der Novel-Auswahl gibt es eine Kachel „＋ Novelle

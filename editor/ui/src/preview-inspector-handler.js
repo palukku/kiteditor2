@@ -384,7 +384,6 @@ export class PreviewInspector {
   // ---------- novels ----------
 
   openNovel(novel) {
-    this.editor.showTab(1);
     this.editor.selectNovel(novel);
   }
 

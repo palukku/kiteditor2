@@ -2,12 +2,13 @@ import { h, changed } from "./dom-service.js";
 import { uploadAsset } from "./api-service.js";
 import "./json-form-component.js";
 
-// Left panel: app name, logos, colors, texts and content files.
-// Every change reloads the preview.
+// Right panel for one item of the "General" folder (see GENERAL_ITEMS in
+// nav-tree-component.js): shows only the slots that item names.
 class BrandingPanel extends HTMLElement {
 
   project = null;
   meta = null;
+  item = null;
   thumbs = [];
 
   connectedCallback() {
@@ -15,19 +16,19 @@ class BrandingPanel extends HTMLElement {
   }
 
   render() {
-    if (!this.project) return;
+    if (!this.project || !this.item) return;
+    const { item, meta } = this;
+    const group = (title, children) => children.length > 0 && [h("h3", null, title), children];
     this.thumbs = [];
-    this.replaceChildren(
-      this.section("App", true, this.renderApp()),
-      this.section("Logos & backgrounds", true, this.meta.imageSlots.map((slot) => this.renderImage(slot))),
-      this.section("Colors", false, this.meta.colorSlots.map((slot) => this.renderColor(slot))),
-      this.section("Texts", false, this.meta.textSlots.map((slot) => this.renderText(slot))),
-      this.section("Content pages", false, this.meta.contentFiles.map((file) => this.renderContent(file))),
-    );
-  }
-
-  section(title, open, children) {
-    return h("details", { class: "section", open }, h("summary", null, title), children);
+    const children = [
+      h("h2", null, item.label),
+      item.appName && this.renderApp(),
+      group("Logos & backgrounds", meta.imageSlots.filter((slot) => item.images?.includes(slot.key)).map((slot) => this.renderImage(slot))),
+      group("Colors", item.colors ? meta.colorSlots.map((slot) => this.renderColor(slot)) : []),
+      group("Texts", item.texts ? meta.textSlots.filter((slot) => item.texts(slot.key)).map((slot) => this.renderText(slot)) : []),
+      item.content?.map((part) => this.renderContent(part)),
+    ];
+    this.replaceChildren(...children.flat(Infinity).filter(Boolean));
   }
 
   renderApp() {
@@ -100,21 +101,30 @@ class BrandingPanel extends HTMLElement {
     );
   }
 
-  renderContent(file) {
+  // A content file, or with "key" one part of it (e.g. the imprint in the legal texts)
+  renderContent({ path, key }) {
     const form = h("json-form");
-    // Rendered on first open only: these files are large
+    let file;
     const load = () => {
-      form.value = this.project.content[file.path] ?? structuredClone(this.meta.content[file.path]);
+      file = this.project.content[path] ?? structuredClone(this.meta.content[path]);
+      form.value = key ? file[key] : file;
       form.render();
     };
+    const reset = () => {
+      if (!key) delete this.project.content[path];
+      else if (this.project.content[path]) this.project.content[path][key] = structuredClone(this.meta.content[path][key]);
+      load();
+      changed(this, true);
+    };
     form.addEventListener("json-change", () => {
-      this.project.content[file.path] = form.value;
+      this.project.content[path] = file;
       changed(this, false);
     });
-    return h("details", { class: "subsection", ontoggle: (e) => e.target.open && !form.value && load() },
-      h("summary", null, file.label),
+    load();
+    return h("div", null,
+      h("h3", null, "Content"),
       h("div", { class: "row" },
-        h("button", { class: "small", onclick: () => { delete this.project.content[file.path]; load(); changed(this, true); } }, "Reset to original"),
+        h("button", { class: "small", onclick: reset }, "Reset to original"),
         h("button", { class: "small", onclick: () => changed(this, true) }, "Show in preview"),
       ),
       form,

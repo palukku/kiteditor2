@@ -14,17 +14,26 @@ with string concatenation: set `textContent` / `value`.
 +--------------------------------------------------------------------------+
 | KITEditor   [saved ✓]                    [↻ Restart preview] [Build app] |
 +----------------+-------------------+-------------------------------------+
-| [Branding]     |                   | Novel: Eltern informieren  [▶ Play] |
-| [Novels]       |   +-----------+   | title / description / colors / bg   |
-|                |   |           |   +-------------------------------------+
-| (active tab    |   | KITE app  |   |  graph: nodes + edges (scroll/drag) |
-|  content)      |   | (iframe)  |   |                                     |
-|                |   |  1 : 2    |   +-------------------------------------+
-|                |   +-----------+   |  selected node: steps + ending      |
+| ▾ General      |                   | Edit view of the selected item:     |
+|   Start screen |   +-----------+   |                                     |
+|   Links        |   |           |   | - General item: its logos, colors,  |
+|   Wiki         |   | KITE app  |   |   texts and content (json-form)     |
+|   Imprint …    |   | (iframe)  |   | - Novel: settings, node graph and   |
+| ▾ Novels       |   |  1 : 2    |   |   the selected node                 |
+|   ⠿ Novel 1 ↑↓ |   +-----------+   |                                     |
+|   ＋ New novel |                   |                                     |
 +----------------+-------------------+-------------------------------------+
 ```
 
-CSS grid `320px auto 1fr`, full viewport height. The phone iframe keeps
+The left column is `<nav-tree>` (`nav-tree-component.js`), like the file tree
+of a code editor. Folders are only folders; a click on an item emits
+`item-select` (General) or `novel-select` (novel), and `editor-main` shows
+`<branding-panel>` with that `item` or `<novel-editor>` on the right.
+`GENERAL_ITEMS` lists which image, color, text and content slots each General
+item shows; every slot belongs to exactly one item. Novels are reordered by
+drag and drop or with ↑/↓.
+
+CSS grid `280px auto 1fr`, full viewport height. The phone iframe keeps
 aspect ratio 1:2 at full available height. Warnings from the last save are
 listed under the top bar.
 

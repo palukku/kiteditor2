@@ -20,7 +20,7 @@ class NovelEditor extends HTMLElement {
 
   render() {
     const novel = this.novel;
-    if (!novel) return this.replaceChildren(h("p", { class: "muted" }, "Create or select a novel in the “Novels” tab."));
+    if (!novel) return this.replaceChildren(h("p", { class: "muted" }, "Create or select a novel in the “Novels” folder on the left."));
     if (!novel.nodes.some((n) => n.id === this.selectedId)) this.selectedId = novel.start;
 
     this.graph = h("novel-graph", { novel, selectedId: this.selectedId });

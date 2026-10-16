@@ -2,7 +2,7 @@ import { getProject, getMeta, saveProject, buildApp, projectFileActions } from "
 import { h } from "./dom-service.js";
 import { PreviewInspector } from "./preview-inspector-handler.js";
 import "./branding-panel-component.js";
-import "./novel-list-component.js";
+import { GENERAL_ITEMS } from "./nav-tree-component.js";
 import "./novel-editor-component.js";
 
 const SAVE_DELAY_MS = 400;
@@ -27,11 +27,13 @@ class EditorMain extends HTMLElement {
     }
     this.selectedNovel = this.project.novels[0] ?? null;
     this.renderShell();
+    this.selectItem(GENERAL_ITEMS[0]);
     this.inspector = new PreviewInspector(this);
 
     this.addEventListener("project-change", (event) => this.scheduleSave(event.detail.preview));
     this.addEventListener("novel-select", (event) => this.selectNovel(event.detail.novel));
-    this.addEventListener("novel-renamed", () => this.novelList.render());
+    this.addEventListener("item-select", (event) => this.selectItem(event.detail.item));
+    this.addEventListener("novel-renamed", () => this.tree.render());
     this.addEventListener("novel-play", async (event) => {
       await this.flush();
       this.reloadPreview(event.detail.name);
@@ -47,15 +49,11 @@ class EditorMain extends HTMLElement {
     this.buildInfo = h("span", { class: "build-info" });
     this.warnings = h("details", { class: "warnings", hidden: true });
 
+    this.tree = h("nav-tree", { project: this.project });
     this.branding = h("branding-panel", { project: this.project, meta: this.meta });
-    this.novelList = h("novel-list", { project: this.project, selected: this.selectedNovel, hidden: true });
-    this.tabs = [
-      h("button", { class: "tab active", onclick: () => this.showTab(0) }, "Branding"),
-      h("button", { class: "tab", onclick: () => this.showTab(1) }, "Novels"),
-    ];
 
     this.preview = h("iframe", { class: "phone", title: "App preview", src: "preview/index.html" });
-    this.novelEditor = h("novel-editor", { project: this.project, novel: this.selectedNovel, meta: this.meta });
+    this.novelEditor = h("novel-editor", { project: this.project, novel: this.selectedNovel, meta: this.meta, hidden: true });
 
     this.replaceChildren(
       h("header", { class: "topbar" },
@@ -74,34 +72,41 @@ class EditorMain extends HTMLElement {
       ),
       this.warnings,
       h("main", { class: "columns" },
-        h("aside", { class: "panel left" }, h("nav", { class: "tabs" }, this.tabs), this.branding, this.novelList),
+        h("aside", { class: "panel left" }, this.tree),
         h("section", { class: "stage" },
           this.preview,
           h("p", { class: "stage-hint" }, "Right-click anything in the app to edit it: texts, logos, backgrounds, novels."),
         ),
-        h("section", { class: "panel right" }, this.novelEditor),
+        h("section", { class: "panel right" }, this.branding, this.novelEditor),
       ),
     );
   }
 
-  showTab(index) {
-    this.tabs.forEach((tab, i) => tab.classList.toggle("active", i === index));
-    this.branding.hidden = index !== 0;
-    this.novelList.hidden = index !== 1;
+  // Shows the edit view of a tree item on the right
+  selectItem(item) {
+    this.branding.item = item;
+    this.branding.render();
+    this.showInTree(item, this.branding);
   }
 
   selectNovel(novel) {
     this.selectedNovel = novel;
-    this.novelList.selected = novel;
-    this.novelList.render();
     this.novelEditor.novel = novel;
     this.novelEditor.render();
+    this.showInTree(novel, this.novelEditor);
+  }
+
+  showInTree(selected, view) {
+    this.tree.selected = selected;
+    this.tree.render();
+    this.branding.hidden = view !== this.branding;
+    this.novelEditor.hidden = view !== this.novelEditor;
   }
 
   // Redraws the side panels after the project was changed from inside the preview
   refreshPanels() {
     this.branding.render();
-    this.novelList.render();
+    this.tree.render();
     this.novelEditor.render();
   }
 
