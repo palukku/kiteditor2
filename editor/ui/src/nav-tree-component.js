@@ -4,17 +4,18 @@ import { createNovel, deleteNovel } from "./novel-model-service.js";
 const LEGAL = "assets/json/legal-content.json";
 
 // The "General" folder: each item names the slots its edit view shows
-// (see branding-panel-component.js). Every slot belongs to exactly one item.
+// (see branding-panel-component.js) and the app scene the preview jumps to.
+// Every slot belongs to exactly one item.
 export const GENERAL_ITEMS = [
-  { label: "Start screen", images: ["logo.circle", "logo.lettering", "logo.sponsor", "bg.darkFlipped"], texts: (key) => key === "start.button" },
-  { label: "Links", content: [{ path: "assets/json/links-scene-content.json" }] },
-  { label: "Wiki", texts: (key) => key.startsWith("knowledge."), content: [{ path: "assets/json/knowledge.json" }] },
-  { label: "Imprint", content: [{ path: LEGAL, key: "impressum" }] },
-  { label: "Privacy", texts: (key) => key === "consent.privacy", content: [{ path: LEGAL, key: "datenschutz" }] },
-  { label: "Terms of use", texts: (key) => key === "consent.tos", content: [{ path: LEGAL, key: "nutzungsbedingungen" }] },
-  { label: "About KITE", texts: (key) => key.startsWith("about.") },
-  { label: "Design", appName: true, images: ["logo.favicon", "bg.dark", "bg.bright", "bg.panorama", "bg.landscape"], colors: true },
-  { label: "Other texts", texts: (key) => /^(archive|bookmarks|feedback)\./.test(key) },
+  { label: "Start screen", scene: "start-scene", images: ["logo.circle", "logo.lettering", "logo.sponsor", "bg.darkFlipped"], texts: (key) => key === "start.button" },
+  { label: "Links", scene: "links-scene", content: [{ path: "assets/json/links-scene-content.json" }] },
+  { label: "Wiki", scene: "knowledge-scene", texts: (key) => key.startsWith("knowledge."), content: [{ path: "assets/json/knowledge.json" }] },
+  { label: "Imprint", scene: "imprint-scene", content: [{ path: LEGAL, key: "impressum" }] },
+  { label: "Privacy", scene: "dataprivacy-scene", texts: (key) => key === "consent.privacy", content: [{ path: LEGAL, key: "datenschutz" }] },
+  { label: "Terms of use", scene: "tos-scene", texts: (key) => key === "consent.tos", content: [{ path: LEGAL, key: "nutzungsbedingungen" }] },
+  { label: "About KITE", scene: "about-kite-scene", texts: (key) => key.startsWith("about.") },
+  { label: "Design", scene: "novel-selector-scene", appName: true, images: ["logo.favicon", "bg.dark", "bg.bright", "bg.panorama", "bg.landscape"], colors: true },
+  { label: "Other texts", scene: "archive-scene", texts: (key) => /^(archive|bookmarks|feedback)\./.test(key) },
 ];
 
 // Left column: navigation tree like in a code editor. Folders "General" and

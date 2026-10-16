@@ -30,7 +30,9 @@ of a code editor. Folders are only folders; a click on an item emits
 `item-select` (General) or `novel-select` (novel), and `editor-main` shows
 `<branding-panel>` with that `item` or `<novel-editor>` on the right.
 `GENERAL_ITEMS` lists which image, color, text and content slots each General
-item shows; every slot belongs to exactly one item. Novels are reordered by
+item shows and the app scene the preview opens (`scene`); every slot belongs
+to exactly one item. Selecting a novel starts it in the preview. Novels are
+reordered by
 drag and drop or with ↑/↓.
 
 CSS grid `280px auto 1fr`, full viewport height. The phone iframe keeps

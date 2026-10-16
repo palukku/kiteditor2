@@ -27,8 +27,8 @@ class EditorMain extends HTMLElement {
     }
     this.selectedNovel = this.project.novels[0] ?? null;
     this.renderShell();
-    this.selectItem(GENERAL_ITEMS[0]);
     this.inspector = new PreviewInspector(this);
+    this.selectItem(GENERAL_ITEMS[0]);
 
     this.addEventListener("project-change", (event) => this.scheduleSave(event.detail.preview));
     this.addEventListener("novel-select", (event) => this.selectNovel(event.detail.novel));
@@ -82,11 +82,12 @@ class EditorMain extends HTMLElement {
     );
   }
 
-  // Shows the edit view of a tree item on the right
+  // Shows the edit view of a tree item on the right and its screen in the preview
   selectItem(item) {
     this.branding.item = item;
     this.branding.render();
     this.showInTree(item, this.branding);
+    this.inspector.showScene(item.scene);
   }
 
   selectNovel(novel) {
@@ -94,6 +95,7 @@ class EditorMain extends HTMLElement {
     this.novelEditor.novel = novel;
     this.novelEditor.render();
     this.showInTree(novel, this.novelEditor);
+    if (novel) this.inspector.showNovel(novel);
   }
 
   showInTree(selected, view) {

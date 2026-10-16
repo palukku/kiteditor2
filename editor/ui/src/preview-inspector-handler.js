@@ -3,7 +3,7 @@ import { uploadAsset } from "./api-service.js";
 import { createNovel, deleteNovel } from "./novel-model-service.js";
 
 // Scenes that can be reopened after a preview reload without extra arguments
-const RESTORABLE_SCENES = new Set(["novel-selector-scene", "settings-scene", "knowledge-scene", "archive-scene", "bookmarks-scene", "links-scene", "about-kite-scene", "legal-information-scene"]);
+const RESTORABLE_SCENES = new Set(["start-scene", "novel-selector-scene", "settings-scene", "knowledge-scene", "archive-scene", "bookmarks-scene", "links-scene", "about-kite-scene", "legal-information-scene", "imprint-scene", "dataprivacy-scene", "tos-scene"]);
 // Layout of the app's novel selection (novel-selector-scene.js / hex-component.js)
 const HEX_X_STEP = 380;
 const HEX_Y = [-288, -102];
@@ -123,6 +123,22 @@ export class PreviewInspector {
     if (tag === "novel-scene" && scene.novel?.name) return this.editor.reloadPreview(scene.novel.name);
     this.restoreScene = RESTORABLE_SCENES.has(tag) ? tag : null;
     this.editor.reloadPreview();
+  }
+
+  // Opens a scene in the running app; while the app is still starting, once it has started
+  showScene(tag) {
+    const current = this.scene?.tagName.toLowerCase();
+    if (!current || current === "loading-scene") this.restoreScene = tag;
+    else this.sceneManager.dispatchEvent(new CustomEvent("sm-switch-scene", { detail: { scene: tag } }));
+  }
+
+  // Starts a novel in the preview, unless it is already running
+  async showNovel(novel) {
+    const name = this.appName(novel);
+    if (this.scene?.tagName.toLowerCase() === "novel-scene" && this.scene.novel?.name === name) return;
+    // A new novel must be saved before the app can load it
+    await this.editor.flush();
+    this.editor.reloadPreview(name);
   }
 
   // Gives the running app the saved novels; redraws the novel selection if it is open

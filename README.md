@@ -47,7 +47,8 @@ Lokal liegt das eigene Projekt in `editor/project/` (nicht versioniert).
 
 **Navigationsbaum:** Links steht ein Baum wie in VS Code – Ordner „General“
 (Startbildschirm, Links, Wiki, Impressum, Datenschutz, …) und „Novels“. Ein
-Klick auf einen Eintrag öffnet rechts dessen Bearbeitungsansicht; Novels lassen
+Klick auf einen Eintrag öffnet rechts dessen Bearbeitungsansicht, und die
+Vorschau springt auf den passenden Bildschirm (bei einer Novel: startet sie). Novels lassen
 sich per Drag & Drop oder mit ↑/↓ umsortieren.
 
 **Direkt in der App bearbeiten:** Rechtsklick auf einen Text, ein Logo, einen
