@@ -18,7 +18,7 @@ const START = "src/scenes/start-scene/start-scene.js";
 
 test("every text slot default exists in its file", async () => {
   const slots = textSlots();
-  for (const key of ["start.button", "about.title", "consent.tos", "consent.privacy", "archive.title", "bookmarks.title", "knowledge.title", "knowledge.intro", "feedback.disclaimer", "feedback.loading", "feedback.error", "about.1.heading", "about.9.text1"]) {
+  for (const key of ["start.button", "consent.tos", "consent.privacy", "links.title", "archive.title", "bookmarks.title", "knowledge.title", "knowledge.intro", "feedback.disclaimer", "feedback.loading", "feedback.error"]) {
     assert.ok(slots.some((s) => s.key === key), `slot ${key} is missing`);
   }
   for (const slot of slots) {
@@ -101,6 +101,19 @@ test("content override replaces the json file", async () => {
   const project = fresh();
   project.content["assets/json/links-scene-content.json"] = [{ title: "x" }];
   assert.deepEqual(JSON.parse(await resolveFile(project, tmp(), "assets/json/links-scene-content.json")), [{ title: "x" }]);
+});
+
+test("uploaded link pictures are served and built", async () => {
+  const dir = tmp();
+  const project = fresh();
+  const rel = "assets/Images/Uploads/link-abc.png";
+  project.content["assets/json/links-scene-content.json"] = [{ title: "x", desc: "", imgSrc: rel, url: "https://a.de" }];
+  fs.mkdirSync(path.join(dir, "assets"));
+  fs.writeFileSync(path.join(dir, "assets", "link-abc"), "PIC");
+  assert.equal((await resolveFile(project, dir, rel)).toString(), "PIC");
+  assert.deepEqual(extraPaths(project), [rel]);
+  assert.equal(await resolveFile(project, dir, "assets/Images/Uploads/..%2Fx.png"), null);
+  assert.equal(await resolveFile(project, dir, "assets/Images/Uploads/missing.png"), null);
 });
 
 test("new novel gets a background", async () => {

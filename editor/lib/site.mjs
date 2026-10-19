@@ -9,7 +9,7 @@ import { APP_DIR, appFiles, loadMeta } from "./slots.mjs";
 
 const EDITOR_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // Modules the browser backend imports; all free of Node imports except serve-static (shipped inside built zips)
-const SHARED_LIBS = ["compile.mjs", "overlay-core.mjs", "zip.mjs", "serve-static.mjs"];
+const SHARED_LIBS = ["compile.mjs", "content-format.mjs", "overlay-core.mjs", "zip.mjs", "serve-static.mjs"];
 
 export function buildSite(outDir) {
   fs.rmSync(outDir, { recursive: true, force: true });

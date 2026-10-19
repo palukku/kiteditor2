@@ -21,10 +21,13 @@ export class AboutKiteScene extends HTMLElement {
       "overflow-hidden",
     );
 
-    // Fetch the Intro Novel and initialize the content component
-    const introNovel = await this.fetchIntroNovel();
+    // Fetch the Intro Novel and the texts, then initialize the content component
+    const [introNovel, about] = await Promise.all([
+      this.fetchIntroNovel(),
+      fetchFromJson("assets/json/about-kite-content.json").catch(() => null),
+    ]);
     this.innerHTML = documentPageShell(
-      buildAboutKiteContentComponent(introNovel),
+      buildAboutKiteContentComponent(introNovel, about),
     );
     attachDocumentPageDragScroll(this);
     wireAboutKiteContentNavigation(this, introNovel);

@@ -5,7 +5,7 @@ import {
   attachDocumentPageDragScroll,
   documentPageShell,
   escapeHtml,
-  renderDocumentSections,
+  renderDocumentBody,
 } from "../../shared-services/shared-document-page-service.js";
 import { fetchFromJson } from "../../shared-services/fetch-service.js";
 
@@ -21,7 +21,7 @@ class ImprintScene extends HTMLElement {
       const block = data.impressum;
       if (block) {
         const title = escapeHtml(block.title || "Impressum");
-        const body = renderDocumentSections(block.sections);
+        const body = renderDocumentBody(block.html);
         mainHtml = `<h1 class="mb-[4.8cqw] text-center text-[4.8cqw] font-bold tracking-tight text-[#213a60]">${title}</h1>${body}`;
       }
     } catch (_) {

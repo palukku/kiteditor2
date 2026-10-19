@@ -38,7 +38,12 @@ async function askEditor(rel) {
 
 async function answer(scope, rel) {
   const body = await askEditor(rel);
-  if (body == null) return fetch(`${scope}app/${rel}`);
+  if (body == null) {
+    // Rewrap the original: a fetched response keeps its app/ URL, and the browser
+    // would resolve relative URLs in it (CSS backgrounds, JS imports) past the preview
+    const original = await fetch(`${scope}app/${rel}`);
+    return new Response(original.body, { status: original.status, statusText: original.statusText, headers: original.headers });
+  }
   const type = TYPES[rel.split(".").pop().toLowerCase()] ?? "application/octet-stream";
   return new Response(body, { headers: { "Content-Type": type, "Cache-Control": "no-store" } });
 }

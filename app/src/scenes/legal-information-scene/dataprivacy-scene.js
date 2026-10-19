@@ -6,7 +6,7 @@ import {
   attachDocumentPageDragScroll,
   documentPageShell,
   escapeHtml,
-  renderDocumentSections,
+  renderDocumentBody,
   renderPrivacyToolbar,
 } from "../../shared-services/shared-document-page-service.js";
 import { fetchFromJson } from "../../shared-services/fetch-service.js";
@@ -22,14 +22,14 @@ class DataprivacyScene extends HTMLElement {
     let mainHtml = '<h1 class="mb-[4.8cqw] text-center text-[4.8cqw] font-bold tracking-tight text-[#0b1a2d]">Datenschutz</h1><p class="text-[3cqw] leading-[1.55] text-[#0b1a2d]">Content could not be loaded.</p>';
 
     let toolbar = null;
-    // data.datenschutz: title, toolbar (reset + info), sections[]
+    // data.datenschutz: title, toolbar (reset + info), html
     try {
       const data = await fetchFromJson("assets/json/legal-content.json");
       const block = data.datenschutz;
       if (block) {
         const title = escapeHtml(block.title || "Datenschutz");
         const toolbarRow = renderPrivacyToolbar(block.toolbar);
-        const body = renderDocumentSections(block.sections);
+        const body = renderDocumentBody(block.html);
         mainHtml = `<h1 class="mb-[4.8cqw] text-center text-[4.8cqw] font-bold tracking-tight text-[#213a60]">${title}</h1>${toolbarRow}${body}`;
         toolbar = block.toolbar;
       }
@@ -71,8 +71,9 @@ class DataprivacyScene extends HTMLElement {
 
   /**
    * Creates an Information Pop-Up and attaches it to its container.
+   * @param {Object} toolbar the toolbar from the JSON (its infoText is shown)
    */
-  attachToolbarInfoPopup() {
+  attachToolbarInfoPopup(toolbar) {
 
     this.infoPopup = createInformationPopup();
 
@@ -87,7 +88,7 @@ class DataprivacyScene extends HTMLElement {
     if (openBtn) {
       openBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        setInformationText(this.infoPopup, DATAPRIVACY_INFO_TEXT);
+        setInformationText(this.infoPopup, toolbar?.infoText || DATAPRIVACY_INFO_TEXT);
         showSwapModal(popupContainer, this.infoPopup);
       });
     }

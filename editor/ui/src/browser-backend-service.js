@@ -4,6 +4,7 @@
 // and a build is a zip download.
 
 import { validateProject } from "../lib/compile.mjs";
+import { migrateProject } from "../lib/content-format.mjs";
 import { createOverlay } from "../lib/overlay-core.mjs";
 import { zipParts } from "../lib/zip.mjs";
 
@@ -62,6 +63,7 @@ export async function createBrowserBackend() {
   const appFiles = new Set(meta.appFiles);
   // The saved project: what preview and build show
   let project = (await store.get(PROJECT_KEY)) ?? (await (await fetch("default-project.json")).json());
+  migrateProject(project, meta.content);
 
   const textCache = new Map();
   const overlay = createOverlay(
@@ -144,6 +146,7 @@ export async function createBrowserBackend() {
           await store.set(ASSET_PREFIX + name, await (await fetch(dataUrl)).blob());
         }
       }
+      migrateProject(next, meta.content);
       project = next;
       await store.set(PROJECT_KEY, project);
     },

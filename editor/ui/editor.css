@@ -24,7 +24,7 @@ body {
 
 [hidden] { display: none !important; }
 
-nav-tree, json-form, node-form { display: block; }
+nav-tree, node-form, rich-text, links-editor, wiki-editor, document-editor { display: block; }
 
 editor-main { display: flex; flex-direction: column; height: 100vh; }
 
@@ -135,9 +135,46 @@ h3 { font-size: 13px; margin: 14px 0 4px; color: var(--muted); text-transform: u
 .row.color { margin: 6px 0; }
 .row.color span { flex: 1; }
 
-.json-object, .json-array { border-left: 2px solid var(--line); padding-left: 8px; margin: 4px 0; }
-.json-item { display: flex; gap: 4px; align-items: flex-start; margin-bottom: 6px; }
-.json-item > :first-child { flex: 1; min-width: 0; }
+.thumb.wide { width: 96px; height: 54px; }
+
+/* ---------- content editors (links, wiki, text pages) ---------- */
+
+.content-head { margin-top: 14px; }
+.content-head h3 { margin: 0; }
+
+.acc-list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
+.acc-row { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+.acc-row.open { border-color: var(--brand); }
+.acc-row.drop-target { box-shadow: inset 0 3px var(--accent); }
+.acc-head { display: flex; align-items: center; gap: 4px; padding: 2px 6px; }
+.acc-row.open > .acc-head { border-bottom: 1px solid var(--line); background: #f7f9fc; }
+.acc-title {
+  flex: 1; min-width: 0; display: flex; gap: 6px; text-align: left;
+  border: 0; background: none; padding: 6px 2px; font-weight: 600;
+}
+.acc-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acc-arrow { color: var(--muted); width: 10px; flex: none; }
+.acc-body { padding: 4px 10px 10px; }
+.acc-body .acc-row { background: #fbfcfe; }
+
+.rich-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 4px; }
+.rich-toolbar button { min-width: 30px; }
+.rich-toolbar button.active { background: #e6ecf6; border-color: var(--brand); }
+.rich-sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
+.fmt-b { font-weight: 700; }
+.fmt-i { font-style: italic; }
+.fmt-u { text-decoration: underline; }
+.rich-area {
+  min-height: 90px; max-height: 420px; overflow: auto;
+  padding: 6px 10px; background: #fff;
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.rich-area:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rich-area p { margin: 0 0 8px; }
+.rich-area h2 { font-size: 16px; display: block; margin: 12px 0 6px; }
+.rich-area h3 { font-size: 14px; margin: 10px 0 4px; color: var(--text); text-transform: none; letter-spacing: 0; }
+.rich-area a { color: #1a5bd6; text-decoration: underline; cursor: pointer; }
+.link-form { margin-top: 6px; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: #f7f9fc; }
 
 
 /* ---------- right panel: novel editor ---------- */

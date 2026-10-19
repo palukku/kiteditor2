@@ -17,7 +17,7 @@ with string concatenation: set `textContent` / `value`.
 | ▾ General      |                   | Edit view of the selected item:     |
 |   Start screen |   +-----------+   |                                     |
 |   Links        |   |           |   | - General item: its logos, colors,  |
-|   Wiki         |   | KITE app  |   |   texts and content (json-form)     |
+|   Wiki         |   | KITE app  |   |   texts and its content editor      |
 |   Imprint …    |   | (iframe)  |   | - Novel: settings, node graph and   |
 | ▾ Novels       |   |  1 : 2    |   |   the selected node                 |
 |   ⠿ Novel 1 ↑↓ |   +-----------+   |                                     |
@@ -36,6 +36,44 @@ read-only (`PreviewInspector.readOnly`): taps, clicks and typing are swallowed,
 scrolling, dragging, external links and right-click editing still work.
 Selecting a novel starts it in the preview and makes it playable. Novels are
 reordered by drag and drop or with ↑/↓.
+
+## Content editors
+
+A General item with `content: { editor, path, key? }` shows that editor
+below its texts. All three extend `ContentEditor` (`content-service.js`): they
+edit a copy of the content file that goes into `project.content` on the first
+edit, so only opening one never creates an override. Typing saves
+(`preview: false`); leaving a field, reordering, adding, deleting and uploads
+also reload the preview. *Reset to original* removes the override (or that
+`key` of it). `branding-panel` keeps one editor per item, so open rows stay
+open while you switch items.
+
+- `<links-editor>`: one row per link (⠿ drag, ↑ ↓ ✕); clicking a row opens
+  it and closes the others. An open link has *Title*, *Content* (rich text),
+  *Picture* (upload as asset `link-<id>`, fit: whole picture / fill) and the
+  address opened by a click on the picture. The page title is the
+  `links.title` text slot above it.
+- `<wiki-editor>`: topics as rows like the links; an open topic has its title
+  and its entries as a nested row list (one entry open at a time) with
+  *Title* and *Content*. Rows of one list only drop into that list.
+- `<document-editor>`: *Title* and *Content* (rich text with headings) for
+  Imprint, Privacy, Terms of use and About KITE; Privacy also has the reset
+  button texts.
+
+Row lists come from `accordionList` / `sortableRow` in `reorder-service.js`
+(the nav tree uses `sortableRow` too).
+
+**`<rich-text>`** (`rich-text-component.js`, props `value`, `headings`): a
+`contenteditable` area with *B*, *I*, *U*, *¶ / H2 / H3* (with `headings`)
+and *Link*. Formatting uses `document.execCommand`. *Link* (or a click on a
+link) opens a small form with link text and address (`www.x.de` becomes
+`https://www.x.de`, an e-mail address `mailto:`) and *Remove link*. Pasting
+inserts plain text. It emits `rich-change` (`detail.html`) while typing and
+`rich-done` when it loses focus after a change. Loading and saving go through
+`rich-text-service.js`, which rebuilds only the allowed tags with `h()` (see
+[01-project-format.md](01-project-format.md#content-files)). Rich fields
+(`desc`, `fullText`, `html`) are not offered for right-click editing in the
+preview, so a plain edit cannot drop their formatting.
 
 CSS grid `280px auto 1fr`, full viewport height. The phone iframe keeps
 aspect ratio 1:2 at full available height. Warnings from the last save are
@@ -83,14 +121,13 @@ presses ▶ Play).
 **Files:**
 - Create: `editor/ui/index.html`, `editor/ui/editor.css`
 - Create: `editor/ui/src/editor-main.js`, `api-service.js`,
-  `branding-panel-component.js`, `json-form-component.js`
+  `branding-panel-component.js` (content editors: see *Content editors* above)
 
 **Interfaces:**
 - Produces (`api-service.js`): `getProject()`, `getMeta()`,
   `saveProject(project) → { warnings }`, `uploadAsset(name, file) → { name }`,
   `buildApp() → { files, dir }`, `assetUrl(name)`.
-- Produces: `<editor-main>`, `<branding-panel>` (props `project`, `meta`),
-  `<json-form>` (prop `value`; emits bubbling `json-change` after in-place edits).
+- Produces: `<editor-main>`, `<branding-panel>` (props `project`, `meta`).
 - Preview control on `editor-main`: `reloadPreview(novelName?)` sets the iframe
   `src` to `/preview/index.html?t=<Date.now()>` plus `&novel=<name>` when given.
 
@@ -103,16 +140,9 @@ presses ▶ Play).
    default), *Reset*.
 4. **Texts** — per text slot: `<textarea>` with `placeholder` = default,
    value = override. Empty value deletes the key.
-5. **Content** — per content file: `<json-form>` editing
-   `project.content[path]` (initialised lazily with a deep copy of
-   `meta.content[path]` on first edit), *Reset* removes the override.
+5. **Content** — the item's content editor (see *Content editors*).
 
 All of them dispatch `project-change` with `preview: true`.
-
-**`<json-form>`** renders any JSON value recursively: strings → auto-growing
-`<textarea>`; numbers/booleans → matching input; arrays → items with
-*remove* and an *add* button (new item = deep copy of the last item with all
-strings emptied; hidden when the array is empty); objects → labelled fields.
 
 **Build button:** saves pending changes, calls `buildApp()`, then shows
 `Built <files> files → <dir>` and a link *Open built app* (`/dist/index.html`).

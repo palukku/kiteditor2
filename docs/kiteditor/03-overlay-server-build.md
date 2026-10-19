@@ -61,16 +61,16 @@ Color slots:
 | `bubbleNpc` | Character speech bubble | `#393a39` |
 | `bubbleInfo` | Info speech bubble | `#0e7f90` |
 
-Text slots: a hand-written list for short UI strings (start button, about
-page title, consent checkbox texts, completion-scene texts) plus slots derived
-at load time from every string literal inside `ABOUT_KITE_SECTIONS` in
-`app/src/scenes/about-kite-scene/content-component.js`
-(`about.<n>.heading`, `about.<n>.text`). Minimum hand-written slot:
+Text slots: a hand-written list for short UI strings (start button, links
+page title, consent checkbox texts, completion-scene texts). Minimum
+hand-written slot:
 `{ key: "start.button", file: "src/scenes/start-scene/start-scene.js", default: "STARTEN" }`.
 
 Content files: `assets/json/legal-content.json` (Legal texts),
 `assets/json/links-scene-content.json` (Links),
-`assets/json/knowledge.json` (Knowledge base).
+`assets/json/knowledge.json` (Knowledge base),
+`assets/json/about-kite-content.json` (About KITE). Their formatted texts
+are rich texts, see [01-project-format.md](01-project-format.md#content-files).
 
 **Overlay rules** for `resolveFile`:
 
@@ -80,6 +80,7 @@ Content files: `assets/json/legal-content.json` (Legal texts),
 | in `CONTENT_FILES` and present in `project.content` | that JSON |
 | `assets/json/image-paths.json` | app list + `extraPaths` |
 | an image slot path with `project.images[key]` set | bytes of that project asset |
+| `assets/Images/Uploads/<name>.png` (`name` matches `^[A-Za-z0-9_-]+$`) | bytes of the project asset `<name>`; these paths are also in `extraPaths` when a content file refers to them |
 | `assets/Images/Background/<name>_BG.png` for a project novel | novel's `background` asset; else `null` if the app file exists; else bytes of the app's `Einstieg_BG.png` |
 | `index.html` | text transform + `<title>` with escaped `appName` inserted after `<head>` |
 | other `*.js`, `*.css`, `*.html` | text transform; `null` when nothing changed |

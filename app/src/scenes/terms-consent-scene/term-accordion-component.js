@@ -1,7 +1,7 @@
 import {
   escapeHtml,
   fetchLegalContent,
-  renderDocumentSections,
+  renderDocumentBody,
 } from "../../shared-services/shared-document-page-service.js";
 import { uiAsset } from "../../shared-services/ui-asset-service.js";
 
@@ -19,8 +19,8 @@ const FALLBACK_BODY =
 
 // Build the body HTML for the accordion
 function buildBody(block) {
-  if (!block?.sections?.length) return FALLBACK_BODY;
-  return renderDocumentSections(block.sections, { variant: "consentAccordion" });
+  if (!block?.html) return FALLBACK_BODY;
+  return renderDocumentBody(block.html, { variant: "consentAccordion" });
 }
 
 // Build the accordion item HTML

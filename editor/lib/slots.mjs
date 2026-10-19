@@ -35,6 +35,7 @@ export const CONTENT_FILES = [
   { path: "assets/json/legal-content.json", label: "Legal texts" },
   { path: "assets/json/links-scene-content.json", label: "Links" },
   { path: "assets/json/knowledge.json", label: "Knowledge base" },
+  { path: "assets/json/about-kite-content.json", label: "About KITE" },
 ];
 
 // Short UI strings. "starts" is the beginning of the string in the source
@@ -42,9 +43,9 @@ export const CONTENT_FILES = [
 // duplicated here. html: the string sits in an HTML template.
 const TEXT_SLOT_SOURCES = [
   { key: "start.button", label: "Start button", file: "src/scenes/start-scene/start-scene.js", starts: "STARTEN", html: true },
-  { key: "about.title", label: "About page title", file: "src/scenes/about-kite-scene/content-component.js", starts: "KITE - kurz erklärt", html: true },
   { key: "consent.tos", label: "Consent: terms checkbox", file: "src/scenes/terms-consent-scene/terms-consent-scene.js", starts: "Ich stimme den" },
   { key: "consent.privacy", label: "Consent: privacy checkbox", file: "src/scenes/terms-consent-scene/terms-consent-scene.js", starts: "Ich habe die Datenschutz" },
+  { key: "links.title", label: "Links page title", file: "src/scenes/links-scene/links-scene.js", starts: "WEITERFÜHRENDE LINKS" },
   { key: "archive.title", label: "Archive title", file: "src/scenes/archive-scene/archive-scene.js", starts: "SPIEL-ARCHIV", html: true },
   { key: "bookmarks.title", label: "Bookmarks title", file: "src/scenes/bookmarks-scene/bookmarks-scene.js", starts: "GEMERKTE NOVELS", html: true },
   { key: "knowledge.title", label: "Knowledge title", file: "src/scenes/knowledge-scene/knowledge-scene.js", starts: "Biases im" },
@@ -54,7 +55,6 @@ const TEXT_SLOT_SOURCES = [
   { key: "feedback.error", label: "Feedback unavailable text", file: "src/scenes/completion-scene/completion-scene.js", starts: "Leider ist aktuell" },
 ];
 
-const ABOUT_FILE = "src/scenes/about-kite-scene/content-component.js";
 const readApp = (rel) => fs.readFileSync(path.join(APP_DIR, rel), "utf8");
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -69,20 +69,6 @@ export function textSlots() {
     const match = text.match(new RegExp(escapeRegExp(source.starts) + (source.html ? "" : '[^"\\\\\\n]*')));
     if (!match) continue;
     slots.push({ key: source.key, label: source.label, file: source.file, default: match[0], html: !!source.html });
-  }
-  // Every heading and paragraph of the about page
-  const about = readApp(ABOUT_FILE).match(/const ABOUT_KITE_SECTIONS = \[([\s\S]*?)\n\];/)?.[1] ?? "";
-  let section = 0;
-  let paragraph = 0;
-  for (const m of about.matchAll(/(heading:\s*)?"([^"\\\n]+)"/g)) {
-    if (m[1]) {
-      section++;
-      paragraph = 0;
-      slots.push({ key: `about.${section}.heading`, label: `About ${section}: heading`, file: ABOUT_FILE, default: m[2], html: false });
-    } else {
-      paragraph++;
-      slots.push({ key: `about.${section}.text${paragraph}`, label: `About ${section}: text ${paragraph}`, file: ABOUT_FILE, default: m[2], html: false });
-    }
   }
   cache = slots;
   return slots;

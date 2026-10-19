@@ -1,65 +1,7 @@
 import {
   escapeHtml,
-  renderDocumentSections,
+  renderDocumentBody,
 } from "../../shared-services/shared-document-page-service.js";
-
-// The sections for the About Kite content component
-const ABOUT_KITE_SECTIONS = [
-  {
-    heading: "Was ist KITE?",
-    paragraphs: [
-      "KITE ist eine gamifizierte Web-App. Du erlebst typische Situationen im Gründungsprozess – z. B. Bankgespräch oder Raumanmietung – und trainierst Reflexion, Handlungskompetenz und Resilienz im Umgang mit Bias.",
-    ],
-  },
-  {
-    heading: "Für wen ist KITE gedacht?",
-    paragraphs: [
-      "KITE richtet sich an Gründerinnen, an Menschen, die mit Gründerinnen arbeiten – z. B. Investor*innen, Berater*innen, Journalist*innen, Vermietende – sowie an Interessierte, die durch Perspektivenübernahme lernen möchten.",
-    ],
-  },
-  {
-    heading: "Wozu dient KITE?",
-    paragraphs: [
-      "Die App hilft dir, Diskriminierung in Gründungssituationen zu erkennen, souverän zu reagieren und Resilienz aufzubauen. Ziel ist nicht, dass du dich „anpasst“, sondern dass diskriminierende Muster sichtbar und benennbar werden und du deine Optionen reflektieren kannst.",
-    ],
-  },
-  {
-    heading: "Wie funktionieren die Visual Novels?",
-    paragraphs: [
-      "Du spielst realistische, von wahren Begebenheiten inspirierte Dialoge. Eine Visual Novel ist eine interaktive Erzählform aus Text und Bildern. Du triffst Dialogentscheidungen und bestimmst den Verlauf. Du schlüpfst in die Rolle einer Gründerin und erlebst ihre Herausforderungen.",
-    ],
-  },
-  {
-    heading: "Wie funktioniert das KI-Feedback?",
-    paragraphs: [
-      "Nach jedem Dialog erhältst du ein KI-basiertes Feedback. Die KI analysiert die Gespräche, weist auf Vorurteile hin (z. B. Zweifel an Müttern, Technik-Stereotype) und zeigt Strategien mit Vor- und Nachteilen auf. Eine Übersicht und Erklärung der verschiedenen Biases findest du in der Wissensbasis.",
-    ],
-  },
-  {
-    heading: "Wie kannst du deinen Fortschritt verfolgen?",
-    paragraphs: [
-      "Im Archiv findest du gespielte Dialoge und Analysen. Du kannst dir Novels merken, sie erneut spielen und sehen, welche Entscheidungen du schon ausprobiert hast.",
-    ],
-  },
-  {
-    heading: "Wer hat KITE entwickelt?",
-    paragraphs: [
-      "KITE wurde an der Hochschule Heilbronn im Lab für Sozioinformatik von einem Team unter Leitung von Prof. Dr. Nicola Marsden entwickelt. Die bundesweite gründerinnenagentur (bga) ist zentrale Partnerin für die App. Gefördert wurde die Entwicklung durch das Bundesministerium für Bildung, Familie, Senioren, Frauen und Jugend (BMBFSFJ) im Rahmen der Förderrichtlinie „Künstliche Intelligenz für das Gemeinwohl“.",
-    ],
-  },
-  {
-    heading: "Wie kann ich starten?",
-    paragraphs: [
-      "Gehe zur Novel-Auswahl. Wähle eine Visual Novel und tauche in die Geschichte ein. Erlebe hautnah, was es bedeutet, gegen Diskriminierung anzutreten.",
-    ],
-  },
-  {
-    heading: "Wie kann ich mehr erfahren?",
-    paragraphs: [
-      "Wenn du zunächst noch mehr über KITE erfahren möchtest, spiele die Einstiegs-Novel.",
-    ],
-  },
-];
 
 /**
  * Build the HTML for the hexagon
@@ -89,17 +31,18 @@ function buildAboutKiteHexHtml(novel) {
 /**
  * Build the HTML for the content component
  * @param {Object} introNovel The Specification of the Intro Novel
+ * @param {Object} about Title and rich text from about-kite-content.json
  * @returns The HTML Element
  */
-export function buildAboutKiteContentComponent(introNovel) {
+export function buildAboutKiteContentComponent(introNovel, about) {
   return `
     <div class="flex w-full justify-center pb-[4cqw] pt-[4cqw]">
       ${buildAboutKiteHexHtml(introNovel)}
     </div>
     <p class="user-font mb-[3.2cqw] font-semibold text-[#0b1a2d]">
-      KITE - kurz erklärt
+      ${escapeHtml(about?.title ?? "")}
     </p>
-    ${renderDocumentSections(ABOUT_KITE_SECTIONS, { variant: "documentUserScalable" })}
+    ${renderDocumentBody(about?.html, { variant: "documentUserScalable" })}
     <div class="mt-[8cqw] flex w-full max-w-full flex-col items-center gap-[3.2cqw]">
       <button type="button" data-about-nav="novel-selector-scene"
         class="w-[62cqw] max-w-full rounded border-[0.1cqw] border-transparent bg-[#0B1A2D] px-[1.8cqw] py-[3.2cqw] text-center text-[3.2cqw] font-bold uppercase tracking-wider text-white transition-opacity active:opacity-80">

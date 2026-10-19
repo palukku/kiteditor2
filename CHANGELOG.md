@@ -7,6 +7,16 @@ All notable changes to this project will be documented in this file. The format 
 ## [Unreleased]
 
 ### Added
+- **KITEditor**: Dedicated editors for Links (sortable rows that open one at a
+  time: title, formatted content, picture upload, picture link; page title),
+  Wiki (sortable topics with sortable entries: title, formatted content) and
+  the text pages Imprint, Privacy, Terms of use and About KITE (title,
+  formatted content with headings). Formatting: bold, italic, underline,
+  links with link text and address, headings on the text pages
+- **App**: Links, wiki entries, legal texts and the About KITE page render
+  formatted text (safe whitelist in `rich-text-service.js`); About KITE now
+  reads `assets/json/about-kite-content.json`; the privacy info popup uses
+  `toolbar.infoText` from the legal content
 - **CI**: New `Validate` GitHub Actions workflow that runs on every push to
   `main` (and on pull requests): regenerates and validates the asset
   manifests, checks all JS modules for syntax errors, and verifies that every
@@ -14,6 +24,16 @@ All notable changes to this project will be documented in this file. The format 
 - **Completion Scene**: The "KIT thinks" loop sound (`SFX_KIThinksLoop`) now
   plays while the AI feedback is being generated and stops once the result or
   error is shown
+
+### Changed
+- **Content JSON**: `links-scene-content.json` (`desc`), `knowledge.json`
+  (`fullText`, "(Quelle)" is now an inline link, `sourceUrl` removed) and
+  `legal-content.json` (`html` instead of `sections`) hold rich texts;
+  older KITEditor projects are converted on load
+
+### Removed
+- **KITEditor**: the generic JSON form (`json-form-component.js`) and the
+  `about.*` text slots (their overrides move into the About KITE content)
 
 ---
 

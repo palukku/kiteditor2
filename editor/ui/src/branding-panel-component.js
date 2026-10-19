@@ -1,6 +1,8 @@
 import { h, changed } from "./dom-service.js";
 import { uploadAsset } from "./api-service.js";
-import "./json-form-component.js";
+import "./links-editor-component.js";
+import "./wiki-editor-component.js";
+import "./document-editor-component.js";
 
 // Right panel for one item of the "General" folder (see GENERAL_ITEMS in
 // nav-tree-component.js): shows only the slots that item names.
@@ -10,6 +12,7 @@ class BrandingPanel extends HTMLElement {
   meta = null;
   item = null;
   thumbs = [];
+  editors = new Map(); // item → its content editor, kept so open rows stay open
 
   connectedCallback() {
     this.render();
@@ -26,7 +29,7 @@ class BrandingPanel extends HTMLElement {
       group("Logos & backgrounds", meta.imageSlots.filter((slot) => item.images?.includes(slot.key)).map((slot) => this.renderImage(slot))),
       group("Colors", item.colors ? meta.colorSlots.map((slot) => this.renderColor(slot)) : []),
       group("Texts", item.texts ? meta.textSlots.filter((slot) => item.texts(slot.key)).map((slot) => this.renderText(slot)) : []),
-      item.content?.map((part) => this.renderContent(part)),
+      item.content && this.renderContent(item),
     ];
     this.replaceChildren(...children.flat(Infinity).filter(Boolean));
   }
@@ -101,34 +104,12 @@ class BrandingPanel extends HTMLElement {
     );
   }
 
-  // A content file, or with "key" one part of it (e.g. the imprint in the legal texts)
-  renderContent({ path, key }) {
-    const form = h("json-form");
-    let file;
-    const load = () => {
-      file = this.project.content[path] ?? structuredClone(this.meta.content[path]);
-      form.value = key ? file[key] : file;
-      form.render();
-    };
-    const reset = () => {
-      if (!key) delete this.project.content[path];
-      else if (this.project.content[path]) this.project.content[path][key] = structuredClone(this.meta.content[path][key]);
-      load();
-      changed(this, true);
-    };
-    form.addEventListener("json-change", () => {
-      this.project.content[path] = file;
-      changed(this, false);
-    });
-    load();
-    return h("div", null,
-      h("h3", null, "Content"),
-      h("div", { class: "row" },
-        h("button", { class: "small", onclick: reset }, "Reset to original"),
-        h("button", { class: "small", onclick: () => changed(this, true) }, "Show in preview"),
-      ),
-      form,
-    );
+  // The content editor of the item (links, wiki or a text page)
+  renderContent(item) {
+    if (!this.editors.has(item)) {
+      this.editors.set(item, h(item.content.editor, { project: this.project, meta: this.meta, item }));
+    }
+    return this.editors.get(item);
   }
 }
 

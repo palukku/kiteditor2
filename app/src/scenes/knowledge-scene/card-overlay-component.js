@@ -1,4 +1,13 @@
 import "./container-component.js";
+import { renderRichText } from "../../shared-services/rich-text-service.js";
+
+// Classes for the formatted text
+const TEXT_STYLES = {
+  h2: "font-bold mt-[4cqw] first:mt-0 mb-[2cqw]",
+  h3: "font-bold mt-[3cqw] first:mt-0 mb-[2cqw]",
+  p: "mb-[4cqw] last:mb-0",
+  a: "text-[#F5944E] break-words",
+};
 
 class CardOverlayComponent extends HTMLElement {
 
@@ -18,20 +27,10 @@ class CardOverlayComponent extends HTMLElement {
     this.detailTitle.className = "user-font text-[#14305d] font-bold text-center";
     this.detailTitle.innerText = this.args.title;
 
-    this.detailText = document.createElement('p');
-    this.detailText.className = "user-font text-[#14305d] leading-[5cqw] whitespace-pre-wrap"; // whitespace-pre-wrap respektiert Zeilenumbrüche im Text
-
-    if (this.args.sourceUrl) {
-      // Searching for the word "(Quelle)" in the text and replacing it with the actual link.
-      const formattedText = this.args.fullText.replace(
-        "(Quelle)", 
-        `<a href="${this.args.sourceUrl}" target="_blank" class="text-[#F5944E]">(Quelle)</a>`
-      );
-      this.detailText.innerHTML = formattedText;
-    } else {
-      // Fallback, if the JSON does not contain an URL
-      this.detailText.innerText = this.args.fullText;
-    }
+    // The full text is a rich text (bold, italic, underline, links)
+    this.detailText = document.createElement('div');
+    this.detailText.className = "user-font text-[#14305d] leading-[5cqw]";
+    this.detailText.innerHTML = renderRichText(this.args.fullText, TEXT_STYLES);
 
     this.detailCard.appendChild(this.detailTitle);
     this.detailCard.appendChild(this.detailText);

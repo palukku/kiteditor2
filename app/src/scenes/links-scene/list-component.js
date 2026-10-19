@@ -1,5 +1,12 @@
 import { fetchFromJson } from "../../shared-services/fetch-service.js";
 import { bindTapOnlyExternalLink } from "../../shared-services/tap-service.js";
+import { renderRichText } from "../../shared-services/rich-text-service.js";
+
+// Classes for the formatted description
+const DESC_STYLES = {
+  p: "mb-[2cqw] last:mb-0",
+  a: "underline break-words",
+};
 
 class ListComponent extends HTMLElement {
 
@@ -21,9 +28,9 @@ class ListComponent extends HTMLElement {
       itemTitle.className = "text-[#14305d] text-[4.5cqw] font-bold";
       itemContainer.appendChild(itemTitle);
 
-      // description
-      const itemDesc = document.createElement('p');
-      itemDesc.innerText = item.desc;
+      // description (rich text)
+      const itemDesc = document.createElement('div');
+      itemDesc.innerHTML = renderRichText(item.desc, DESC_STYLES);
       itemDesc.className = "text-[#14305d] text-[3.5cqw] leading-[5.5cqw] mb-[2cqw]";
       itemContainer.appendChild(itemDesc);
 

@@ -1,119 +1,46 @@
 // Shared helpers for scrollable document-style screens (legal, about KITE, etc.):
-// safe HTML, section markup, optional privacy toolbar, layout shell, drag scroll.
+// safe HTML for the rich-text body, optional privacy toolbar, layout shell, drag scroll.
 // Used by legal sub-scenes and terms-consent-scene (accordion bodies).
 
 import { addDragScrolling } from "./drag-scrolling-service.js";
 import { uiAsset } from "./ui-asset-service.js";
+import { escapeHtml, renderRichText } from "./rich-text-service.js";
 
 const LEGAL_JSON_URL = "assets/json/legal-content.json";
 
-// Variant styles for the document content
+// Tailwind classes per tag of the rich text, for each document variant
 const VARIANT_STYLES = {
   document: {
-    heading: (top) =>
-      `mb-[3.2cqw] text-[3.6cqw] font-bold text-[#0b1a2d]${top}`,
-    linesBlock: "mb-[3.2cqw] text-[3.6cqw] leading-tight text-[#0b1a2d]",
-    paragraph: "mb-[2.4cqw] text-[3.6cqw] leading-tight text-[#0b1a2d]",
-    link: "text-blue-700 underline break-words",
+    h2: "mt-[5.6cqw] first:mt-0 mb-[3.2cqw] text-[3.6cqw] font-bold text-[#0b1a2d]",
+    h3: "mt-[4cqw] first:mt-0 mb-[2.4cqw] text-[3.4cqw] font-bold text-[#0b1a2d]",
+    p: "mb-[2.4cqw] text-[3.6cqw] leading-tight text-[#0b1a2d]",
+    a: "text-blue-700 underline break-words",
   },
   documentUserScalable: {
-    heading: (top) =>
-      `user-font mb-[3.2cqw] font-bold text-[#0b1a2d]${top}`,
-    linesBlock: "user-font mb-[3.2cqw] leading-tight text-[#0b1a2d]",
-    paragraph: "user-font mb-[2.4cqw] leading-tight text-[#0b1a2d]",
-    link: "text-blue-700 underline break-words",
+    h2: "user-font mt-[5.6cqw] first:mt-0 mb-[3.2cqw] font-bold text-[#0b1a2d]",
+    h3: "user-font mt-[4cqw] first:mt-0 mb-[2.4cqw] font-bold text-[#0b1a2d]",
+    p: "user-font mb-[2.4cqw] leading-tight text-[#0b1a2d]",
+    a: "text-blue-700 underline break-words",
   },
   consentAccordion: {
-    heading: (top) => `mb-[2cqw] text-[3cqw] font-bold text-white${top}`,
-    linesBlock: "mb-[2cqw] text-[2.85cqw] leading-snug text-white/90",
-    paragraph: "mb-[2cqw] text-[2.85cqw] leading-snug text-white/90",
-    link: "text-sky-200 underline break-words",
+    h2: "mt-[4cqw] first:mt-0 mb-[2cqw] text-[3cqw] font-bold text-white",
+    h3: "mt-[3cqw] first:mt-0 mb-[2cqw] text-[2.9cqw] font-bold text-white",
+    p: "mb-[2cqw] text-[2.85cqw] leading-snug text-white/90",
+    a: "text-sky-200 underline break-words",
   },
 };
 
-/**
- * Escape HTML characters
- * @param {*} text 
- * @returns 
- */
-export function escapeHtml(text) {
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+export { escapeHtml };
 
 /**
- * Check if the href is safe
- * @param {*} href 
- * @returns 
+ * Build HTML for a document body (a rich text, see rich-text-service.js)
+ * @param {String} html the rich text
+ * @param {Object} options { variant: "document" | "documentUserScalable" | "consentAccordion" }
+ * @returns
  */
-function isSafeHref(href) {
-  const h = String(href || "").trim();
-  return h.startsWith("https://") || h.startsWith("http://");
-}
-
-function getVariantStyles(variant) {
-  if (variant === "consentAccordion") return VARIANT_STYLES.consentAccordion;
-  if (variant === "documentUserScalable") return VARIANT_STYLES.documentUserScalable;
-  return VARIANT_STYLES.document;
-}
-
-/**
- * One paragraph: plain string or array of text / link segments
- * @param {*} p 
- * @param {*} variant 
- * @returns 
- */
-function renderParagraphBlock(p, variant) {
-  const { paragraph: pClass, link: linkClass } = getVariantStyles(variant);
-  if (typeof p === "string") {
-    return `<p class="${pClass}">${escapeHtml(p)}</p>`;
-  }
-  if (!Array.isArray(p)) return "";
-
-  const inner = p
-    .map((seg) => {
-      if (typeof seg === "string") return escapeHtml(seg);
-      if (seg && seg.type === "text" && seg.text != null) return escapeHtml(seg.text);
-      if (seg && seg.type === "link" && seg.text && seg.href && isSafeHref(seg.href)) {
-        return `<a href="${escapeHtml(seg.href)}" class="${linkClass}" rel="noopener noreferrer">${escapeHtml(seg.text)}</a>`;
-      }
-      return "";
-    })
-    .join("");
-
-  return `<p class="${pClass}">${inner}</p>`;
-}
-
-/**
- * Build HTML for sections (heading, optional lines, optional paragraphs)
- * @param {*} sections 
- * @param {*} options 
- * @returns 
- */
-export function renderDocumentSections(sections, options = {}) {
-  const variant = options.variant ?? "document";
-  const styles = getVariantStyles(variant);
-  if (!sections || !sections.length) return "";
-  return sections
-    .map((section, index) => {
-      const top = index === 0 ? "" : variant === "consentAccordion" ? " mt-[4cqw]" : " mt-[5.6cqw]";
-      const heading = section.heading
-        ? `<h2 class="${styles.heading(top)}">${escapeHtml(section.heading)}</h2>`
-        : "";
-
-      let body = "";
-      if (section.lines && section.lines.length) {
-        body += `<p class="${styles.linesBlock}">${section.lines.map(escapeHtml).join("<br />")}</p>`;
-      }
-      if (section.paragraphs && section.paragraphs.length) {
-        body += section.paragraphs.map((p) => renderParagraphBlock(p, variant)).join("");
-      }
-      return heading + body;
-    })
-    .join("");
+export function renderDocumentBody(html, options = {}) {
+  // Own wrapper, so the first heading has no top margin (first:mt-0)
+  return `<div>${renderRichText(html, VARIANT_STYLES[options.variant] ?? VARIANT_STYLES.document)}</div>`;
 }
 
 /**

@@ -14,11 +14,15 @@ const TAP_MOVE_PX = 10;
 
 const norm = (text) => String(text ?? "").replace(/\s+/g, " ").trim();
 
+// Content fields holding a rich text
+const RICH_KEYS = new Set(["desc", "fullText", "html"]);
+
 // Finds the key path of a string inside a JSON value
 function findPath(value, wanted, path = []) {
   if (typeof value === "string") return norm(value) === wanted ? path : null;
   if (!value || typeof value !== "object") return null;
-  for (const key of Object.keys(value)) {
+  // Rich texts (see lib/content-format.mjs) are edited in the side panel, so a plain edit cannot drop their formatting
+  for (const key of Object.keys(value).filter((key) => !RICH_KEYS.has(key))) {
     const found = findPath(value[key], wanted, [...path, key]);
     if (found) return found;
   }

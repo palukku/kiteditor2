@@ -31,6 +31,7 @@ KITEditor is the local white-label configurator around the app. Plan and format:
 - Two backends behind `editor/ui/src/api-service.js`: the local server (`editor/server.mjs`, project on disk) and the browser (`browser-backend-service.js` + `sw.js`, project in IndexedDB, build as zip). Shared logic must stay free of Node imports: `lib/compile.mjs`, `lib/overlay-core.mjs`, `lib/zip.mjs`. All UI URLs are relative (the site runs under a sub-path).
 - Editing inside the preview (right-click a text, logo or novel; the “add novel” tile) lives in `editor/ui/src/preview-inspector-handler.js`. It works on the iframe from outside; do not add editor code to `app/`. Text and image edits change the running app in place; colors and backgrounds use `softReload()`, which returns to the same screen.
 - Novels are stored in the editor's node format and compiled by `editor/lib/compile.mjs`. No Twee.
+- Formatted content (links, wiki, legal texts, about KITE) is a rich text: an HTML string with only `p, h2, h3, br, b, i, u, a[href]`. The app renders it only through `app/src/shared-services/rich-text-service.js` (never `innerHTML` of raw JSON); the editor edits it with `<rich-text>` and cleans it with `editor/ui/src/rich-text-service.js`. Format and migration of older projects: `editor/lib/content-format.mjs`.
 - Commands:
     - Start: `node editor/server.mjs` (http://127.0.0.1:4173)
     - Tests: `node --test editor/test/*.test.mjs`

@@ -1,30 +1,30 @@
 [
     {
-    "title": "KITE auf Linkedin",
-    "desc": "Raum für Austausch, Rückmeldungen und weitere Informationen rund um die KITE App.",
-    "imgSrc": "assets/Images/IconsAndLogos/Linkedin-Triffuns.png",
-    "url": "https://www.linkedin.com/groups/16301070/",
-    "imgStyle": "object-cover"
+        "title": "KITE auf Linkedin",
+        "desc": "<p>Raum für Austausch, Rückmeldungen und weitere Informationen rund um die KITE App.</p>",
+        "imgSrc": "assets/Images/IconsAndLogos/Linkedin-Triffuns.png",
+        "url": "https://www.linkedin.com/groups/16301070/",
+        "imgStyle": "object-cover"
     },
     {
-    "title": "Bundesweite Gründerinnenagentur",
-    "desc": "Die bga ist das zentrale Netzwerk für Gründerinnen in Deutschland. Auf dem Netzwerkportal findest du Informationen, Beratungsmöglichkeiten, Veranstaltungen und Kontakte zu Expert*innen. Ob du dich gerade in der Planung befindest oder bereits gegründet hast – die bga unterstützt dich mit Wissen, Inspiration und Vernetzung.",
-    "imgSrc": "assets/Images/IconsAndLogos/Logo_BGA.png",
-    "url": "https://www.gruenderinnenagentur.de/home",
-    "imgStyle": "object-contain"
+        "title": "Bundesweite Gründerinnenagentur",
+        "desc": "<p>Die bga ist das zentrale Netzwerk für Gründerinnen in Deutschland. Auf dem Netzwerkportal findest du Informationen, Beratungsmöglichkeiten, Veranstaltungen und Kontakte zu Expert*innen. Ob du dich gerade in der Planung befindest oder bereits gegründet hast – die bga unterstützt dich mit Wissen, Inspiration und Vernetzung.</p>",
+        "imgSrc": "assets/Images/IconsAndLogos/Logo_BGA.png",
+        "url": "https://www.gruenderinnenagentur.de/home",
+        "imgStyle": "object-contain"
     },
     {
-    "title": "HHN Lab für Sozioinformatik",
-    "desc": "Das Lab für Sozioinformatik erforscht, wie digitale Technologien unser Zusammenleben prägen – und wie sie gesellschaftlich verantwortungsvoll gestaltet werden können. In Projekten zu Themen wie KI, Gender und Partizipation entwickelt das Team praxisnahe Anwendungen, die soziale Wirkung entfalten.",
-    "imgSrc": "assets/Images/IconsAndLogos/logo_hhn_lab.png",
-    "url": "https://www.hs-heilbronn.de/de/lab-sozioinformatik",
-    "imgStyle": "object-contain"
+        "title": "HHN Lab für Sozioinformatik",
+        "desc": "<p>Das Lab für Sozioinformatik erforscht, wie digitale Technologien unser Zusammenleben prägen – und wie sie gesellschaftlich verantwortungsvoll gestaltet werden können. In Projekten zu Themen wie KI, Gender und Partizipation entwickelt das Team praxisnahe Anwendungen, die soziale Wirkung entfalten.</p>",
+        "imgSrc": "assets/Images/IconsAndLogos/logo_hhn_lab.png",
+        "url": "https://www.hs-heilbronn.de/de/lab-sozioinformatik",
+        "imgStyle": "object-contain"
     },
     {
-    "title": "KITE-Projektseite",
-    "desc": "Hier erfährst du mehr über die Hintergründe der App. KITE wurde im Rahmen eines Forschungsprojekts entwickelt, um Gründerinnen mit KI-gestütztem Feedback zu unterstützen. Ziel ist es, Barrieren im Gründungsprozess sichtbar zu machen und Wege aufzuzeigen, sie zu überwinden. Gefördert vom Bundesministerium für Bildung, Familie, Senioren, Frauen und Jugend – gemeinsam mit der Hochschule Heilbronn und der bga.",
-    "imgSrc": "assets/Images/IconsAndLogos/Logo_Kite.png",
-    "url": "https://kite-bga.de/home",
-    "imgStyle": "object-contain"
+        "title": "KITE-Projektseite",
+        "desc": "<p>Hier erfährst du mehr über die Hintergründe der App. KITE wurde im Rahmen eines Forschungsprojekts entwickelt, um Gründerinnen mit KI-gestütztem Feedback zu unterstützen. Ziel ist es, Barrieren im Gründungsprozess sichtbar zu machen und Wege aufzuzeigen, sie zu überwinden. Gefördert vom Bundesministerium für Bildung, Familie, Senioren, Frauen und Jugend – gemeinsam mit der Hochschule Heilbronn und der bga.</p>",
+        "imgSrc": "assets/Images/IconsAndLogos/Logo_Kite.png",
+        "url": "https://kite-bga.de/home",
+        "imgStyle": "object-contain"
     }
 ]

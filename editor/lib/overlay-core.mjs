@@ -16,6 +16,8 @@ const BACKGROUND = /^assets\/Images\/Background\/(.+)_BG\.png$/;
 const FALLBACK_BACKGROUND = "assets/Images/Background/Einstieg_BG.png";
 const COLOR = /^#[0-9a-fA-F]{6}$/;
 const NOVEL_NAME = /^[A-Za-z0-9_-]+$/;
+// Pictures uploaded for content (link pictures): assets/Images/Uploads/<asset name>.png
+const UPLOAD = /^assets\/Images\/Uploads\/([A-Za-z0-9_-]+)\.png$/;
 
 const backgroundPath = (name) => `assets/Images/Background/${name}_BG.png`;
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -36,10 +38,20 @@ export function createOverlay(slots, io) {
       .filter((entry) => NOVEL_NAME.test(entry.name ?? ""));
   }
 
-  // Files that exist only through the overlay (backgrounds of new novels).
+  // Uploaded pictures the content files point at (link pictures)
+  function uploadPaths(project) {
+    const paths = new Set();
+    const visit = (value) => {
+      if (typeof value === "string" && UPLOAD.test(value)) paths.add(value);
+      else if (value && typeof value === "object") Object.values(value).forEach(visit);
+    };
+    for (const file of slots.content) visit(project.content?.[file.path]);
+    return [...paths];
+  }
+
+  // Files that exist only through the overlay (backgrounds of new novels, uploads).
   function extraPaths(project) {
-    return appNames(project)
-      .map(({ name }) => backgroundPath(name))
+    return [...appNames(project).map(({ name }) => backgroundPath(name)), ...uploadPaths(project)]
       .filter((rel) => !io.exists(rel));
   }
 
@@ -73,6 +85,9 @@ export function createOverlay(slots, io) {
       const original = extra.length ? await io.read(rel) : null;
       return original ? JSON.stringify([...JSON.parse(new TextDecoder().decode(original)), ...extra]) : null;
     }
+
+    const upload = rel.match(UPLOAD);
+    if (upload) return io.asset(upload[1]);
 
     const slot = slots.image.find((s) => s.path === rel);
     if (slot) return project.images?.[slot.key] ? io.asset(project.images[slot.key]) : null;

@@ -24,10 +24,33 @@ One project = `editor/project/project.json` plus uploaded files in
 | `images` | image slot key → file name inside `editor/project/assets/`. Missing key = app default |
 | `colors` | color slot key → `#rrggbb`. Missing key = app default |
 | `texts` | text slot key → replacement string. Missing or empty = app default |
-| `content` | app-relative JSON path → full replacement JSON value. Only paths in `CONTENT_FILES` are honoured |
+| `content` | app-relative JSON path → full replacement JSON value. Only paths in `CONTENT_FILES` are honoured. Shapes: see *Content files* below |
 | `novels` | array of editor novels (below). Order = order in the app's novel selector |
 
 Slot keys are defined in `editor/lib/slots.mjs` (Task 3).
+
+## Content files
+
+The editable pages of the app. Fields marked *rich* hold a **rich text**: an
+HTML string with only `p`, `h2`, `h3`, `br`, `b`, `i`, `u` and `a[href]`
+(`http(s):`, `mailto:`, `tel:`). The app renders it with
+`app/src/shared-services/rich-text-service.js`, which drops everything else
+and keeps its text; the editor edits it with `<rich-text>`.
+
+| File | Shape |
+|---|---|
+| `assets/json/links-scene-content.json` | `[{ title, desc (rich), imgSrc, url, imgStyle: "object-contain" \| "object-cover" }]` |
+| `assets/json/knowledge.json` | `[{ title, items: [{ title, fullText (rich) }] }]` (topics with entries) |
+| `assets/json/legal-content.json` | `{ impressum, datenschutz, nutzungsbedingungen }`, each `{ title, html (rich) }`; `datenschutz` also has `toolbar: { resetLabel, infoText }` |
+| `assets/json/about-kite-content.json` | `{ title, html (rich) }` |
+
+A picture uploaded for a link is stored as project asset `link-<id>` and
+referenced as `imgSrc: "assets/Images/Uploads/link-<id>.png"`; the overlay
+serves and builds it.
+
+Older projects (plain-text descriptions, legal `sections`, wiki `sourceUrl`,
+`about.*` text slots) are converted on load by `migrateProject` in
+`editor/lib/content-format.mjs`.
 
 ## Editor novel
 

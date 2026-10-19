@@ -30,7 +30,6 @@
     --leading-tight: 1.25;
     --leading-snug: 1.375;
     --leading-normal: 1.5;
-    --leading-relaxed: 1.625;
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -463,6 +462,12 @@
   .hidden {
     display: none;
   }
+  .inline {
+    display: inline;
+  }
+  .table {
+    display: table;
+  }
   .aspect-\[16\/9\] {
     aspect-ratio: 16/9;
   }
@@ -660,6 +665,9 @@
   }
   .shrink-0 {
     flex-shrink: 0;
+  }
+  .grow {
+    flex-grow: 1;
   }
   .origin-\[50\%_20\%\] {
     transform-origin: 50% 20%;
@@ -938,6 +946,9 @@
   }
   .bg-\[\#0B1A2D\] {
     background-color: #0B1A2D;
+  }
+  .bg-\[\#0b1a2d\] {
+    background-color: #0b1a2d;
   }
   .bg-\[\#0c447f\] {
     background-color: #0c447f;
@@ -1218,6 +1229,9 @@
   .text-\[2\.8cqw\] {
     font-size: 2.8cqw;
   }
+  .text-\[2\.9cqw\] {
+    font-size: 2.9cqw;
+  }
   .text-\[2\.85cqw\] {
     font-size: 2.85cqw;
   }
@@ -1340,9 +1354,6 @@
   .whitespace-pre-line {
     white-space: pre-line;
   }
-  .whitespace-pre-wrap {
-    white-space: pre-wrap;
-  }
   .text-\[\#0B1A2D\] {
     color: #0B1A2D;
   }
@@ -1370,6 +1381,9 @@
   .text-\[\#F5944E\] {
     color: #F5944E;
   }
+  .text-\[\#ff0000\] {
+    color: #ff0000;
+  }
   .text-blue-700 {
     color: var(--color-blue-700);
   }
@@ -1390,6 +1404,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-white) 90%, transparent);
     }
+  }
+  .lowercase {
+    text-transform: lowercase;
   }
   .uppercase {
     text-transform: uppercase;
@@ -1423,11 +1440,12 @@
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .brightness-0 {
-    --tw-brightness: brightness(0%);
+  .blur {
+    --tw-blur: blur(8px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
-  .filter {
+  .brightness-0 {
+    --tw-brightness: brightness(0%);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .transition {
@@ -1480,6 +1498,12 @@
   }
   .group-open\:hidden:is(:where(.group):is([open], :popover-open, :open) *) {
     display: none;
+  }
+  .first\:mt-0:first-child {
+    margin-top: 0px;
+  }
+  .last\:mb-0:last-child {
+    margin-bottom: 0px;
   }
   .empty\:hidden:empty {
     display: none;

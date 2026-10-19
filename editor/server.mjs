@@ -6,6 +6,7 @@ import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateProject } from "./lib/compile.mjs";
+import { migrateProject } from "./lib/content-format.mjs";
 import { resolveFile, build } from "./lib/overlay.mjs";
 import { APP_DIR, loadMeta } from "./lib/slots.mjs";
 import { buildSite } from "./lib/site.mjs";
@@ -16,6 +17,13 @@ const PUBLIC_DIR = path.join(HERE, "ui");
 const DEFAULT_PROJECT = path.join(HERE, "default-project.json");
 const MAX_BODY = 20 * 1024 * 1024;
 const ASSET_NAME = /^[A-Za-z0-9_-][A-Za-z0-9._-]*$/;
+
+// Reads a project file and brings older content to the current format
+function readProject(file) {
+  const project = JSON.parse(fs.readFileSync(file, "utf8"));
+  migrateProject(project, loadMeta().content);
+  return project;
+}
 
 function json(res, status, value) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
@@ -52,7 +60,7 @@ export function createServer({ projectDir, distDir }) {
         fs.mkdirSync(projectDir, { recursive: true });
         fs.copyFileSync(DEFAULT_PROJECT, projectFile);
       }
-      project = JSON.parse(fs.readFileSync(projectFile, "utf8"));
+      project = readProject(projectFile);
     }
     return project;
   };
@@ -134,7 +142,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const options = { projectDir: path.join(HERE, "project"), distDir: path.resolve(HERE, "../dist") };
   if (process.argv.includes("--build")) {
     const projectFile = path.join(options.projectDir, "project.json");
-    const project = JSON.parse(fs.readFileSync(fs.existsSync(projectFile) ? projectFile : DEFAULT_PROJECT, "utf8"));
+    const project = readProject(fs.existsSync(projectFile) ? projectFile : DEFAULT_PROJECT);
     const { files } = await build(project, options.projectDir, options.distDir);
     console.log(`Built ${files} files → ${options.distDir}\nPlay it: node dist/serve.mjs`);
   } else if (process.argv.includes("--site")) {

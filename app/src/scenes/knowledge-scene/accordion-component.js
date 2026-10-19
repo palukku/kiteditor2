@@ -2,6 +2,7 @@ import "./card-overlay-component.js";
 import { addOpenOnTapOnly } from "../../shared-services/tap-service.js";
 import { fetchFromJson } from "../../shared-services/fetch-service.js";
 import { uiAsset } from "../../shared-services/ui-asset-service.js";
+import { richTextToPlain } from "../../shared-services/rich-text-service.js";
 
 class Accordion extends HTMLElement {
 
@@ -64,6 +65,7 @@ class Accordion extends HTMLElement {
 
       // Die Karten generieren
       category.items.forEach(item => {
+        const plainText = richTextToPlain(item.fullText);
         const card = document.createElement('div');
         card.className = "w-full bg-white p-[3cqw] rounded-[2cqw] flex flex-col gap-[1cqw] active:bg-gray-50 transition-colors hover:bg-gray-200";
         
@@ -72,7 +74,7 @@ class Accordion extends HTMLElement {
         title.className = "user-font text-[#14305d] font-bold";
 
         const teaser = document.createElement('p');
-        teaser.innerText = item.fullText;
+        teaser.innerText = plainText;
         teaser.className = "user-font text-[#14305d]/80 leading-[4.5cqw] line-clamp-4"; // line-clamp kürzt den Text mit "..."
 
         card.appendChild(title);
@@ -82,8 +84,7 @@ class Accordion extends HTMLElement {
           const cardOverlay = document.createElement('card-overlay-component');
           cardOverlay.args = {
             title: item.title,
-            fullText: item.fullText,
-            sourceUrl: item.sourceUrl
+            fullText: item.fullText
           };
 
           this.classList.add('hidden');
@@ -103,7 +104,7 @@ class Accordion extends HTMLElement {
           domElement: card,
           parentCategory: categoryWrapper,
           cardsWrapper: cardsWrapper,
-          searchText: (item.title + " " + item.fullText).toLowerCase() // Such-Index
+          searchText: (item.title + " " + plainText).toLowerCase() // Such-Index
         });
       });
 

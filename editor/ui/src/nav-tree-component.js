@@ -1,19 +1,21 @@
 import { h, emit, changed } from "./dom-service.js";
 import { createNovel, deleteNovel } from "./novel-model-service.js";
+import { moveItem, sortableRow } from "./reorder-service.js";
 
 const LEGAL = "assets/json/legal-content.json";
 
 // The "General" folder: each item names the slots its edit view shows
-// (see branding-panel-component.js) and the app scene the preview jumps to.
-// Every slot belongs to exactly one item.
+// (see branding-panel-component.js), its content editor ("content": which
+// component edits which content file, see lib/content-format.mjs) and the app
+// scene the preview jumps to. Every slot belongs to exactly one item.
 export const GENERAL_ITEMS = [
   { label: "Start screen", scene: "start-scene", images: ["logo.circle", "logo.lettering", "logo.sponsor", "bg.darkFlipped"], texts: (key) => key === "start.button" },
-  { label: "Links", scene: "links-scene", content: [{ path: "assets/json/links-scene-content.json" }] },
-  { label: "Wiki", scene: "knowledge-scene", texts: (key) => key.startsWith("knowledge."), content: [{ path: "assets/json/knowledge.json" }] },
-  { label: "Imprint", scene: "imprint-scene", content: [{ path: LEGAL, key: "impressum" }] },
-  { label: "Privacy", scene: "dataprivacy-scene", texts: (key) => key === "consent.privacy", content: [{ path: LEGAL, key: "datenschutz" }] },
-  { label: "Terms of use", scene: "tos-scene", texts: (key) => key === "consent.tos", content: [{ path: LEGAL, key: "nutzungsbedingungen" }] },
-  { label: "About KITE", scene: "about-kite-scene", texts: (key) => key.startsWith("about.") },
+  { label: "Links", scene: "links-scene", texts: (key) => key === "links.title", content: { editor: "links-editor", path: "assets/json/links-scene-content.json" } },
+  { label: "Wiki", scene: "knowledge-scene", texts: (key) => key.startsWith("knowledge."), content: { editor: "wiki-editor", path: "assets/json/knowledge.json" } },
+  { label: "Imprint", scene: "imprint-scene", content: { editor: "document-editor", path: LEGAL, key: "impressum" } },
+  { label: "Privacy", scene: "dataprivacy-scene", texts: (key) => key === "consent.privacy", content: { editor: "document-editor", path: LEGAL, key: "datenschutz" } },
+  { label: "Terms of use", scene: "tos-scene", texts: (key) => key === "consent.tos", content: { editor: "document-editor", path: LEGAL, key: "nutzungsbedingungen" } },
+  { label: "About KITE", scene: "about-kite-scene", content: { editor: "document-editor", path: "assets/json/about-kite-content.json" } },
   { label: "Design", scene: "novel-selector-scene", appName: true, images: ["logo.favicon", "bg.dark", "bg.bright", "bg.panorama", "bg.landscape"], colors: true },
   { label: "Other texts", scene: "archive-scene", texts: (key) => /^(archive|bookmarks|feedback)\./.test(key) },
 ];
@@ -26,7 +28,7 @@ class NavTree extends HTMLElement {
   project = null;
   selected = null; // a GENERAL_ITEMS entry or a novel
   closed = new Set();
-  dragIndex = null;
+  drag = { index: null };
 
   connectedCallback() {
     this.render();
@@ -56,9 +58,7 @@ class NavTree extends HTMLElement {
   }
 
   move(from, to) {
-    const novels = this.project.novels;
-    if (from === to || to < 0 || to >= novels.length) return;
-    novels.splice(to, 0, novels.splice(from, 1)[0]);
+    if (!moveItem(this.project.novels, from, to)) return;
     changed(this, true);
     this.render();
   }
@@ -71,31 +71,7 @@ class NavTree extends HTMLElement {
       changed(this, true);
       emit(this, "novel-select", { novel: this.project.novels[0] ?? null });
     };
-    const row = h("li", {
-      class: novel === this.selected ? "selected" : "",
-      draggable: true,
-      ondragstart: (e) => {
-        this.dragIndex = index;
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", novel.title); // Firefox only drags with data set
-      },
-      ondragover: (e) => {
-        if (this.dragIndex === null) return;
-        e.preventDefault();
-        row.classList.add("drop-target");
-      },
-      ondragleave: () => row.classList.remove("drop-target"),
-      ondrop: (e) => {
-        e.preventDefault();
-        const from = this.dragIndex;
-        this.dragIndex = null;
-        this.move(from, index);
-      },
-      ondragend: () => {
-        this.dragIndex = null;
-        this.querySelectorAll(".drop-target").forEach((el) => el.classList.remove("drop-target"));
-      },
-    },
+    const row = h("li", { class: novel === this.selected ? "selected" : "" },
       h("span", { class: "grip", "aria-hidden": "true" }, "⠿"),
       h("span", { class: "dot", style: `background:${novel.color}` }),
       h("button", { class: "tree-item", onclick: () => emit(this, "novel-select", { novel }) }, novel.title || "(untitled)"),
@@ -104,6 +80,7 @@ class NavTree extends HTMLElement {
       h("button", { class: "icon", title: "Move down", disabled: index === last, onclick: () => this.move(index, index + 1) }, "↓"),
       !novel.intro && h("button", { class: "icon", title: "Delete novel", onclick: remove }, "✕"),
     );
+    sortableRow(row, row, index, this.drag, (from, to) => this.move(from, to));
     return row;
   }
 
