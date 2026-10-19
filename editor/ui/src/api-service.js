@@ -14,6 +14,7 @@ const serverBackend = {
   saveProject: (project) => fetch("api/project", { method: "PUT", body: JSON.stringify(project) }).then(json),
   uploadAsset: (name, file) => fetch(`api/asset/${encodeURIComponent(name)}`, { method: "POST", body: file }).then(json),
   buildApp: () => fetch("api/build", { method: "POST" }).then(json),
+  resetProject: () => fetch("api/project/reset", { method: "POST" }).then(json),
 };
 
 async function pickBackend() {
@@ -36,6 +37,9 @@ export const uploadAsset = async (name, file) => (await use()).uploadAsset(name,
 
 // → { files, dir, url, download? }: url opens the build; with "download" it is a zip to save
 export const buildApp = async () => (await use()).buildApp();
+
+// Replaces the project with the default one (uploaded files are kept)
+export const resetProject = async () => (await use()).resetProject();
 
 // Only the browser backend has these (the local server keeps the project as files); null otherwise
 export const projectFileActions = async () => {

@@ -108,6 +108,15 @@ test("meta lists slots and characters", async () => {
   assert.ok(Array.isArray(meta.content["assets/json/knowledge.json"]));
 });
 
+test("POST /api/project/reset restores the default project", async () => {
+  const project = await getJson("/api/project");
+  project.appName = "Changed";
+  await put(JSON.stringify(project));
+  const reset = await (await fetch(base + "/api/project/reset", { method: "POST" })).json();
+  assert.equal(reset.appName, "KITE");
+  assert.equal((await getJson("/api/project")).appName, "KITE");
+});
+
 test("unknown routes are 404", async () => {
   assert.equal((await fetch(base + "/nope.html")).status, 404);
   assert.equal((await fetch(base + "/api/unknown", { method: "POST" })).status, 404);

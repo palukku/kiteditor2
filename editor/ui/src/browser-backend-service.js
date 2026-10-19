@@ -146,6 +146,13 @@ export async function createBrowserBackend() {
       return new Blob([JSON.stringify({ project, assets }, null, 2)], { type: "application/json" });
     },
 
+    async resetProject() {
+      project = await (await fetch("default-project.json")).json();
+      migrateProject(project, meta.content);
+      await store.set(PROJECT_KEY, project);
+      return structuredClone(project);
+    },
+
     async importProject(file) {
       const data = parseProjectFile(await file.text());
       // Accepts an export of this editor, or a plain project.json of the local editor

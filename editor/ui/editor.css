@@ -76,6 +76,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 }
 button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 button.small { padding: 3px 8px; font-size: 12px; }
+/* Destructive action; "armed" while it waits for the confirming second click */
+button.danger.armed { background: #c62828; border-color: #c62828; color: #fff; font-weight: 600; }
 button.icon { padding: 2px 7px; font-size: 12px; }
 
 input[type="text"], input[type="number"], textarea, select {

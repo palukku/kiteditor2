@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file. The format 
   the text pages Imprint, Privacy, Terms of use and About KITE (title,
   formatted content with headings). Formatting: bold, italic, underline,
   links with link text and address, headings on the text pages
+- **KITEditor**: *Reset project* button in the top bar; it only resets when
+  clicked again during a 5-second countdown
 - **KITEditor**: Live preview for all General items: content, texts, colors,
   images and the app name show in the running app within a moment, without
   reloading it (scroll position and open sections stay); only novel changes

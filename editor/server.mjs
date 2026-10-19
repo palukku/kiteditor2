@@ -89,6 +89,14 @@ export function createServer({ projectDir, distDir }) {
       return json(res, 200, { warnings: validateProject(project) });
     }
 
+    // Back to the default project; uploaded files stay in assets/ (nothing refers to them any more)
+    if (urlPath === "/api/project/reset" && req.method === "POST") {
+      fs.mkdirSync(projectDir, { recursive: true });
+      fs.copyFileSync(DEFAULT_PROJECT, projectFile);
+      project = readProject(projectFile);
+      return json(res, 200, project);
+    }
+
     if (urlPath === "/api/meta" && req.method === "GET") return json(res, 200, (meta ??= loadMeta()));
 
     if (urlPath === "/api/build" && req.method === "POST") {

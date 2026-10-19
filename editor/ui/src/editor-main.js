@@ -1,5 +1,5 @@
-import { getProject, getMeta, saveProject, buildApp, projectFileActions } from "./api-service.js";
-import { h } from "./dom-service.js";
+import { getProject, getMeta, saveProject, buildApp, resetProject, projectFileActions } from "./api-service.js";
+import { h, confirmButton } from "./dom-service.js";
 import { PreviewInspector } from "./preview-inspector-handler.js";
 import "./branding-panel-component.js";
 import { GENERAL_ITEMS } from "./nav-tree-component.js";
@@ -71,6 +71,7 @@ class EditorMain extends HTMLElement {
           "Import project",
           h("input", { type: "file", accept: "application/json,.json", hidden: true, onchange: (e) => this.importProject(e.target.files[0]) }),
         ),
+        confirmButton("Reset project", "Really reset everything?", () => this.resetProject(), 5, { class: "danger", title: "Back to the original app: removes all changes and novels you added" }),
         h("button", { onclick: () => this.reloadPreview() }, "↻ Restart preview"),
         h("button", { class: "primary", onclick: () => this.build() }, "Build app"),
       ),
@@ -192,6 +193,17 @@ class EditorMain extends HTMLElement {
     const url = URL.createObjectURL(await this.fileActions.exportProject());
     h("a", { href: url, download: "kiteditor-project.json" }).click();
     URL.revokeObjectURL(url);
+  }
+
+  async resetProject() {
+    try {
+      // Pending edits must not be saved over the reset project
+      await this.flush();
+      await resetProject();
+      location.reload();
+    } catch (error) {
+      alert(`Reset failed: ${error.message}`);
+    }
   }
 
   async importProject(file) {

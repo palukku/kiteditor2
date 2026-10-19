@@ -162,6 +162,7 @@ slot is never inside raw HTML outside a JS file.)
 | `POST /api/asset/<name>` | raw body (≤ 20 MB) → `projectDir/assets/<name>`; name must match `^[A-Za-z0-9._-]+$` and not start with `.`; `{ name }` |
 | `GET /api/asset/<name>` | the uploaded file |
 | `POST /api/build` | `{ files, dir }` |
+| `POST /api/project/reset` | copies `default-project.json` over the project and returns it; uploaded assets stay on disk |
 | `GET /api/meta` | `{ imageSlots, colorSlots, textSlots, contentFiles, characters, expressions, sounds, biases, content }` |
 
   `meta.characters` = `characters` array of `character-info.json` without id 0;

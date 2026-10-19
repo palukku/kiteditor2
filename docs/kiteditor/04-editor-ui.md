@@ -165,6 +165,11 @@ presses ▶ Play).
 
 All of them dispatch `project-change` with `preview: true`.
 
+**Reset project button:** `confirmButton()` (`dom-service.js`): the first
+click turns it red with a countdown (“Really reset everything? 5…”); only a
+second click within those 5 seconds saves pending edits, calls
+`resetProject()` (default project; uploads are kept) and reloads the editor.
+
 **Build button:** saves pending changes, calls `buildApp()`, then shows
 `Built <files> files → <dir>` and a link *Open built app* (`/dist/index.html`).
 

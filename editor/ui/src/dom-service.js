@@ -27,3 +27,37 @@ export function emit(el, name, detail = {}) {
 export function changed(el, preview = false) {
   emit(el, "project-change", { preview });
 }
+
+// A button for destructive actions: the first click arms it and counts down
+// ("Really reset? 5…"); only a second click within that time runs the action,
+// otherwise it falls back to its label.
+export function confirmButton(label, question, action, seconds = 5, props = {}) {
+  let timer = null;
+  let left = 0;
+  const disarm = () => {
+    clearInterval(timer);
+    timer = null;
+    button.classList.remove("armed");
+    button.textContent = label;
+  };
+  const tick = () => {
+    if (left === 0) return disarm();
+    button.textContent = `${question} ${left}…`;
+    left--;
+  };
+  const button = h("button", {
+    ...props,
+    onclick: () => {
+      if (!timer) {
+        left = seconds;
+        button.classList.add("armed");
+        tick();
+        timer = setInterval(tick, 1000);
+        return;
+      }
+      disarm();
+      action();
+    },
+  }, label);
+  return button;
+}
