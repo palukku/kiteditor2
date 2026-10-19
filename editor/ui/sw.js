@@ -1,7 +1,8 @@
 // Service worker of the browser-only editor (not used with the local server).
 // It makes "preview/<file>" work without a server: the request is handed to
 // the editor page, which answers with the white-labelled file, or with
-// nothing, in which case the original app file is served.
+// nothing, in which case the original app file is served. All other files
+// of the site are revalidated, so a new deploy never mixes with cached ones.
 
 const TYPES = { html: "text/html; charset=utf-8", js: "text/javascript; charset=utf-8", css: "text/css; charset=utf-8", json: "application/json; charset=utf-8", png: "image/png" };
 const ANSWER_TIMEOUT_MS = 5000;
@@ -12,8 +13,17 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 self.addEventListener("fetch", (event) => {
   const scope = new URL(self.registration.scope).pathname;
   const prefix = `${scope}preview/`;
-  const pathname = new URL(event.request.url).pathname;
-  if (!pathname.startsWith(prefix)) return;
+  const url = new URL(event.request.url);
+  const pathname = url.pathname;
+  if (!pathname.startsWith(prefix)) {
+    // GitHub Pages lets browsers cache files for 10 minutes; right after a deploy
+    // that loads new modules next to old ones. "no-cache" asks the server every
+    // time (an unchanged file costs only a 304).
+    if (event.request.method === "GET" && url.origin === self.location.origin && pathname.startsWith(scope)) {
+      event.respondWith(fetch(event.request, { cache: "no-cache" }).catch(() => fetch(event.request)));
+    }
+    return;
+  }
   let rel;
   try {
     rel = decodeURIComponent(pathname.slice(prefix.length)) || "index.html";

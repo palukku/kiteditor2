@@ -57,7 +57,8 @@ async function startServiceWorker() {
   if (!("serviceWorker" in navigator)) {
     throw new Error("this browser blocks service workers here. The online editor needs an https:// address (or localhost) and no private window.");
   }
-  await navigator.serviceWorker.register("sw.js");
+  // updateViaCache "none": the browser always fetches sw.js itself fresh, so a deploy takes over at once
+  await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
   await navigator.serviceWorker.ready;
   if (!navigator.serviceWorker.controller) {
     await Promise.race([
