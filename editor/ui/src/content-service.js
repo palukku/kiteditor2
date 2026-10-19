@@ -25,15 +25,15 @@ export class ContentEditor extends HTMLElement {
     this.data = this.project.content[this.path] ?? structuredClone(this.meta.content[this.path]);
   }
 
-  // Stores the edited copy; preview: reload the app preview after the save
-  edit(preview) {
+  // Stores the edited copy; the preview shows it right away
+  edit() {
     this.project.content[this.path] = this.data;
-    changed(this, preview);
+    changed(this, "live");
   }
 
-  // A change to the structure: save, reload the preview, redraw
+  // A change to the structure: save and redraw
   editAndRender() {
-    this.edit(true);
+    this.edit();
     this.render();
   }
 
@@ -42,7 +42,7 @@ export class ContentEditor extends HTMLElement {
     const { key } = this.item.content;
     if (!key) delete this.project.content[this.path];
     else if (this.project.content[this.path]) this.project.content[this.path][key] = structuredClone(this.meta.content[this.path][key]);
-    changed(this, true);
+    changed(this, "live");
     this.render();
   }
 
@@ -54,16 +54,15 @@ export class ContentEditor extends HTMLElement {
     );
   }
 
-  // Text input for object[key]; the preview reloads once the field is left
+  // Text input for object[key]
   textField(label, object, key, { multiline = false, oninput } = {}) {
     const props = {
       value: object[key] ?? "",
       oninput: (e) => {
         object[key] = e.target.value;
         oninput?.();
-        this.edit(false);
+        this.edit();
       },
-      onchange: () => this.edit(true),
     };
     return h("label", { class: "field" },
       h("span", null, label),
@@ -81,9 +80,8 @@ export class ContentEditor extends HTMLElement {
         headings,
         "onrich-change": (e) => {
           object[key] = e.detail.html;
-          this.edit(false);
+          this.edit();
         },
-        "onrich-done": () => this.edit(true),
       }),
     );
   }

@@ -15,14 +15,12 @@ const BLOCK_FORMATS = [
 
 // Small text editor for rich texts: bold, italic, underline, links and, with
 // "headings", headings. Set .value (and .headings) before it is attached.
-// Emits "rich-change" (detail.html) while typing and "rich-done" when the
-// field loses focus after a change.
+// Emits "rich-change" (detail.html) on every change.
 class RichText extends HTMLElement {
 
   value = "";
   headings = false;
   area = null;
-  dirty = false;
   range = null; // the selection the link form works on
   anchor = null; // the link being edited, if any
 
@@ -34,9 +32,6 @@ class RichText extends HTMLElement {
       oninput: () => this.changed(),
       // New lines should be paragraphs, not <div>s (Chrome's default)
       onfocus: () => document.execCommand("defaultParagraphSeparator", false, "p"),
-      onfocusout: (e) => {
-        if (!this.contains(e.relatedTarget)) this.done();
-      },
       onpaste: (e) => {
         // Only the text: formatting from web pages or Word would be dropped anyway
         e.preventDefault();
@@ -110,14 +105,7 @@ class RichText extends HTMLElement {
 
   changed() {
     this.value = serializeRichText(this.area, this.headings);
-    this.dirty = true;
     emit(this, "rich-change", { html: this.value });
-  }
-
-  done() {
-    if (!this.dirty) return;
-    this.dirty = false;
-    emit(this, "rich-done", { html: this.value });
   }
 
   // Marks the buttons of the formats at the caret
@@ -152,7 +140,6 @@ class RichText extends HTMLElement {
     this.linkForm.hidden = true;
     this.anchor = null;
     this.range = null;
-    this.done();
   }
 
   applyLink() {

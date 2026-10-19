@@ -1,6 +1,7 @@
 import { h, changed } from "./dom-service.js";
 import { uploadAsset } from "./api-service.js";
 import { createNovel, deleteNovel } from "./novel-model-service.js";
+import { LivePreview } from "./live-preview-handler.js";
 
 // Scenes that can be reopened after a preview reload without extra arguments
 const RESTORABLE_SCENES = new Set(["start-scene", "novel-selector-scene", "settings-scene", "knowledge-scene", "archive-scene", "bookmarks-scene", "links-scene", "about-kite-scene", "legal-information-scene", "imprint-scene", "dataprivacy-scene", "tos-scene"]);
@@ -39,6 +40,10 @@ export class PreviewInspector {
     this.restoreScene = null;
     // true while a General item is selected: the app only scrolls and opens external links
     this.readOnly = false;
+    // true while the editor itself clicks in the app (see passClicks)
+    this.passing = false;
+    // Shows changes to the General items without reloading
+    this.live = new LivePreview(editor, this);
     this.menu = h("div", { class: "context-menu", hidden: true });
     this.filePicker = h("input", { type: "file", accept: "image/*", hidden: true });
     editor.append(this.menu, this.filePicker);
@@ -87,7 +92,18 @@ export class PreviewInspector {
     doc.addEventListener("pointerdown", () => this.closeMenu(), true);
     this.blockInteraction(doc.defaultView);
     new MutationObserver(() => this.decorate()).observe(doc.documentElement, { childList: true, subtree: true });
+    this.live.attach(doc);
     this.decorate();
+  }
+
+  // Runs fn with the read-only block switched off, for clicks the editor makes itself
+  passClicks(fn) {
+    this.passing = true;
+    try {
+      fn();
+    } finally {
+      this.passing = false;
+    }
   }
 
   // Read-only mode: swallows taps, clicks and typing before the app sees them.
@@ -98,7 +114,7 @@ export class PreviewInspector {
     const allowed = (event) => {
       const link = event.target.closest?.("a[href]");
       const external = link && new URL(link.href, win.location.href).origin !== win.location.origin;
-      return !this.readOnly || external || event.target.closest?.(".kiteditor-add");
+      return !this.readOnly || this.passing || external || event.target.closest?.(".kiteditor-add");
     };
     const block = (event) => {
       if (allowed(event)) return;
@@ -116,6 +132,7 @@ export class PreviewInspector {
 
   // Runs whenever the app changes its DOM
   decorate() {
+    this.live.decorate();
     const scene = this.scene;
     if (!scene) return;
     const tag = scene.tagName.toLowerCase();
@@ -149,7 +166,7 @@ export class PreviewInspector {
 
   // ---------- reloading ----------
 
-  // Reloads the app (needed for colors and backgrounds) and returns to the same place
+  // Reloads the app and returns to the same place (novel changes; General items update live)
   softReload() {
     const scene = this.scene;
     const tag = scene?.tagName.toLowerCase();
@@ -159,7 +176,9 @@ export class PreviewInspector {
   }
 
   // Opens a scene in the running app; while the app is still starting, once it has started
-  showScene(tag) {
+  async showScene(tag) {
+    // While a screen is redrawn the app has two; it can only switch with one
+    await this.live.whenIdle();
     const current = this.scene?.tagName.toLowerCase();
     if (!current || current === "loading-scene") this.restoreScene = tag;
     else this.sceneManager.dispatchEvent(new CustomEvent("sm-switch-scene", { detail: { scene: tag } }));
@@ -190,12 +209,11 @@ export class PreviewInspector {
   }
 
   // Saves, then shows the result in panels and app
-  async commit({ reload = false } = {}) {
-    changed(this.editor, false);
+  async commit() {
+    changed(this.editor, "live");
     this.editor.refreshPanels();
-    // The save itself hands the new novels to the running app (editor-main.save)
+    // The save itself hands the new novels and images to the running app (editor-main.save)
     await this.editor.flush();
-    if (reload) this.softReload();
   }
 
   // ---------- context menu ----------
@@ -379,7 +397,7 @@ export class PreviewInspector {
     for (let el = target; el && el.nodeType === 1; el = el.parentElement) {
       const url = view.getComputedStyle(el).backgroundImage.match(/url\("?([^")]+)"?\)/)?.[1];
       const slot = url && this.slotOfUrl(url);
-      if (slot) return { slot, isBackground: true };
+      if (slot) return { slot };
     }
     return null;
   }
@@ -398,7 +416,7 @@ export class PreviewInspector {
   }
 
   // file = null resets the slot to the app's original image
-  async setImage({ slot, isBackground }, file) {
+  async setImage({ slot }, file) {
     try {
       if (file) {
         await uploadAsset(slot.key, file);
@@ -409,13 +427,9 @@ export class PreviewInspector {
     } catch (error) {
       return alert(`Upload failed: ${error.message}`);
     }
-    // Backgrounds come from the style sheet, so they need a reload; <img> can be swapped in place
-    await this.commit({ reload: isBackground });
-    this.editor.branding.refreshThumbnails();
-    if (isBackground) return;
-    for (const img of this.doc.images) {
-      if (this.slotOfUrl(img.src) === slot) img.src = `${slot.path}?t=${Date.now()}`;
-    }
+    // The save shows the new image in the app and in the thumbnails (editor-main.save)
+    this.editor.pendingImages.add(slot.key);
+    await this.commit();
   }
 
   async pickNovelBackground(novel, novelScene) {

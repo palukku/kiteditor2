@@ -15,6 +15,8 @@ class EditorMain extends HTMLElement {
   selectedNovel = null;
   saveTimer = null;
   pendingPreview = false;
+  pendingImages = new Set(); // image slots replaced since the last save
+  saved = null; // the project as the server has it (what the preview was built from)
   saving = Promise.resolve();
 
   async connectedCallback() {
@@ -25,12 +27,14 @@ class EditorMain extends HTMLElement {
       this.textContent = `Could not load the project: ${error.message}`;
       return;
     }
+    this.saved = structuredClone(this.project);
     this.selectedNovel = this.project.novels[0] ?? null;
     this.renderShell();
     this.inspector = new PreviewInspector(this);
     this.selectItem(GENERAL_ITEMS[0]);
 
     this.addEventListener("project-change", (event) => this.scheduleSave(event.detail.preview));
+    this.addEventListener("image-change", (event) => this.pendingImages.add(event.detail.key));
     this.addEventListener("novel-select", (event) => this.selectNovel(event.detail.novel));
     this.addEventListener("item-select", (event) => this.selectItem(event.detail.item));
     this.addEventListener("novel-renamed", () => this.tree.render());
@@ -128,8 +132,11 @@ class EditorMain extends HTMLElement {
     this.preview.src = `preview/index.html?t=${Date.now()}${novel}`;
   }
 
+  // preview: true reloads the preview after the save (novels), "live" shows
+  // the change in the running preview right away (General items)
   scheduleSave(preview) {
-    this.pendingPreview ||= !!preview;
+    if (preview === "live") this.inspector.live.update();
+    this.pendingPreview ||= preview === true;
     this.status.textContent = "saving…";
     clearTimeout(this.saveTimer);
     this.saveTimer = setTimeout(() => this.flush(), SAVE_DELAY_MS);
@@ -148,18 +155,26 @@ class EditorMain extends HTMLElement {
   }
 
   async save(preview) {
+    const sent = structuredClone(this.project);
+    const images = [...this.pendingImages];
+    this.pendingImages.clear();
     try {
-      const { warnings } = await saveProject(this.project);
+      const { warnings } = await saveProject(sent);
+      const novelsChanged = JSON.stringify(sent.novels) !== JSON.stringify(this.saved.novels);
+      this.saved = sent;
       this.status.textContent = "saved ✓";
       this.showWarnings(warnings);
       if (preview) {
-        // Colors, images and content need a reload; the inspector returns to the same screen
+        // Novel changes need a reload; the inspector returns to the same screen
         this.inspector.softReload();
-        this.branding.refreshThumbnails();
-      } else {
+      } else if (novelsChanged) {
         await this.inspector.refreshNovels();
       }
+      // The server has the new images now, so the running app can load them
+      if (images.length > 0) this.inspector.live.refreshImages(images);
+      if (preview || images.length > 0) this.branding.refreshThumbnails();
     } catch (error) {
+      images.forEach((key) => this.pendingImages.add(key));
       this.status.textContent = `save failed: ${error.message}`;
     }
   }

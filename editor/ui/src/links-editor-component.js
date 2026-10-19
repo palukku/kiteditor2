@@ -69,13 +69,13 @@ class LinksEditor extends ContentEditor {
         await uploadAsset(name, file);
         link.imgSrc = `${UPLOADS}${name}.png`;
         thumb.src = `preview/${link.imgSrc}`;
-        this.edit(true);
+        this.edit();
       } catch (error) {
         alert(`Upload failed: ${error.message}`);
       }
       event.target.value = "";
     };
-    const fit = h("select", { onchange: (e) => { link.imgStyle = e.target.value; this.edit(true); } },
+    const fit = h("select", { onchange: (e) => { link.imgStyle = e.target.value; this.edit(); } },
       FITS.map((option) => h("option", { value: option.value }, option.label)),
     );
     fit.value = link.imgStyle || "object-contain";

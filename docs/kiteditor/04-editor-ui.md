@@ -42,9 +42,9 @@ reordered by drag and drop or with ↑/↓.
 A General item with `content: { editor, path, key? }` shows that editor
 below its texts. All three extend `ContentEditor` (`content-service.js`): they
 edit a copy of the content file that goes into `project.content` on the first
-edit, so only opening one never creates an override. Typing saves
-(`preview: false`); leaving a field, reordering, adding, deleting and uploads
-also reload the preview. *Reset to original* removes the override (or that
+edit, so only opening one never creates an override. Every change shows in
+the running preview right away (`preview: "live"`, see *Live preview*).
+*Reset to original* removes the override (or that
 `key` of it). `branding-panel` keeps one editor per item, so open rows stay
 open while you switch items.
 
@@ -93,10 +93,30 @@ attaches to the iframe document from outside on every load:
   immediately, Enter/blur saves, Escape reverts.
 - **Novel selection** gets an extra “＋ Novelle hinzufügen” tile; tiles offer
   edit, rename, play, delete.
-- Live updates: texts and `<img>` slots are changed in place; novel changes
-  are pushed into the running app (`refreshNovels` sets `window.novelsCache`
-  and redraws the selection); colors and CSS backgrounds need `softReload()`,
-  which reloads and reopens the same scene.
+- Live updates: see *Live preview*; novel changes are pushed into the
+  running app (`refreshNovels` sets `window.novelsCache` and redraws the
+  selection) or use `softReload()`, which reloads and reopens the same scene.
+
+## Live preview
+
+Changes to General items never reload the preview
+(`live-preview-handler.js`, `LivePreview`, owned by the inspector). It knows
+what the running app was built from (`editor-main.saved` when the iframe
+loaded) and patches the difference to the current project, ~100 ms after a
+change and before the save:
+
+- **Content files:** the iframe's `fetch()` answers them from the project in
+  memory. A screen showing one (links, wiki, legal pages, about, consent) is
+  built again hidden next to the old one and swapped in when its DOM is
+  quiet, keeping scroll positions, open wiki topics and open `<details>`.
+- **Texts:** the text nodes showing a text slot (as built, or as last set)
+  get the new value; new screens are fixed in `decorate()`.
+- **Colors:** a copy of `tailwind.css` replaces the stylesheet: selectors
+  keep the built colors (the DOM classes use them), values get the new ones.
+- **Images:** after the save (the server needs them), `<img>`, the browser
+  icon and CSS `url()`s of replaced slots get `?v=<time>` (`image-change`
+  event → `editor-main.pendingImages`).
+- **App name:** `document.title`.
 
 ## Shared state contract
 
@@ -109,8 +129,9 @@ bubbling `project-change` event:
 new CustomEvent("project-change", { bubbles: true, detail: { preview: true } })
 ```
 
-`detail.preview: true` → the preview iframe reloads after the save
-(branding changes). `false`/absent → save only (novel editing; the user
+`detail.preview: true` → the preview iframe reloads after the save (novel
+changes). `"live"` → shown in the running preview at once (General items,
+see *Live preview*). `false`/absent → save only (novel editing; the user
 presses ▶ Play).
 
 `editor-main` debounces saves by 400 ms (`PUT /api/project`), shows

@@ -21,7 +21,9 @@ export function emit(el, name, detail = {}) {
   el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
 }
 
-// Tells the editor that the project object was changed
+// Tells the editor that the project object was changed. preview: true
+// reloads the preview after the save (novels), "live" shows the change in the
+// running preview right away (General items), false only saves.
 export function changed(el, preview = false) {
   emit(el, "project-change", { preview });
 }

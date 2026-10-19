@@ -1,4 +1,4 @@
-import { h, changed } from "./dom-service.js";
+import { h, emit, changed } from "./dom-service.js";
 import { uploadAsset } from "./api-service.js";
 import "./links-editor-component.js";
 import "./wiki-editor-component.js";
@@ -37,7 +37,7 @@ class BrandingPanel extends HTMLElement {
   renderApp() {
     return h("label", { class: "field" },
       h("span", null, "App name (browser tab)"),
-      h("input", { type: "text", value: this.project.appName ?? "", oninput: (e) => { this.project.appName = e.target.value; changed(this, true); } }),
+      h("input", { type: "text", value: this.project.appName ?? "", oninput: (e) => { this.project.appName = e.target.value; changed(this, "live"); } }),
     );
   }
 
@@ -50,7 +50,7 @@ class BrandingPanel extends HTMLElement {
       try {
         await uploadAsset(slot.key, file);
         this.project.images[slot.key] = slot.key;
-        changed(this, true);
+        this.imageChanged(slot);
       } catch (error) {
         alert(`Upload failed: ${error.message}`);
       }
@@ -62,13 +62,19 @@ class BrandingPanel extends HTMLElement {
         h("span", null, slot.label),
         h("div", { class: "row" },
           h("input", { type: "file", accept: "image/*", onchange: upload }),
-          h("button", { class: "small", onclick: () => { delete this.project.images[slot.key]; changed(this, true); } }, "Reset"),
+          h("button", { class: "small", onclick: () => { delete this.project.images[slot.key]; this.imageChanged(slot); } }, "Reset"),
         ),
       ),
     );
   }
 
-  // Called by editor-main after each save: thumbnails show the saved project
+  // The app shows the new image once it is saved (editor-main.save)
+  imageChanged(slot) {
+    emit(this, "image-change", { key: slot.key });
+    changed(this, "live");
+  }
+
+  // Called by editor-main after saves with new images: thumbnails show the saved project
   refreshThumbnails() {
     for (const { thumb, slot } of this.thumbs) thumb.src = `preview/${slot.path}?t=${Date.now()}`;
   }
@@ -77,13 +83,13 @@ class BrandingPanel extends HTMLElement {
     const input = h("input", {
       type: "color",
       value: this.project.colors[slot.key] ?? slot.default,
-      // "change" fires once when the picker closes; "input" would reload the preview on every drag step
-      onchange: (e) => { this.project.colors[slot.key] = e.target.value; changed(this, true); },
+      // Every step while dragging in the picker shows in the preview
+      oninput: (e) => { this.project.colors[slot.key] = e.target.value; changed(this, "live"); },
     });
     return h("div", { class: "row color" },
       input,
       h("span", null, slot.label),
-      h("button", { class: "small", onclick: () => { delete this.project.colors[slot.key]; input.value = slot.default; changed(this, true); } }, "Reset"),
+      h("button", { class: "small", onclick: () => { delete this.project.colors[slot.key]; input.value = slot.default; changed(this, "live"); } }, "Reset"),
     );
   }
 
@@ -95,10 +101,10 @@ class BrandingPanel extends HTMLElement {
         rows,
         placeholder: slot.default,
         value: this.project.texts[slot.key] ?? "",
-        onchange: (e) => {
+        oninput: (e) => {
           if (e.target.value) this.project.texts[slot.key] = e.target.value;
           else delete this.project.texts[slot.key];
-          changed(this, true);
+          changed(this, "live");
         },
       }),
     );
