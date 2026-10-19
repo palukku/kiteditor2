@@ -1,0 +1,6 @@
+{
+  "ports": [
+    { "port": 4173, "label": "KITEditor Dev Server" },
+    { "port": 4174, "label": "Built App Server (dist)" }
+  ]
+}
