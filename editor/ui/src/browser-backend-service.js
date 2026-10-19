@@ -40,6 +40,16 @@ function openStore() {
   };
 }
 
+// The JSON of an exported project, with a readable error for edited files
+function parseProjectFile(text) {
+  try {
+    // A byte order mark from some text editors is not JSON
+    return JSON.parse(text.replace(/^\uFEFF/, ""));
+  } catch (error) {
+    throw new Error(`the file is not valid JSON (${error.message}). If it was edited or reformatted, check for trailing commas, comments or single quotes.`);
+  }
+}
+
 const toBytes = async (response) => (response.ok ? new Uint8Array(await response.arrayBuffer()) : null);
 
 // The preview iframe only works once the service worker controls this page
@@ -132,11 +142,12 @@ export async function createBrowserBackend() {
           reader.readAsDataURL(blob);
         });
       }
-      return new Blob([JSON.stringify({ project, assets })], { type: "application/json" });
+      // Indented, so the file is readable without reformatting it
+      return new Blob([JSON.stringify({ project, assets }, null, 2)], { type: "application/json" });
     },
 
     async importProject(file) {
-      const data = JSON.parse(await file.text());
+      const data = parseProjectFile(await file.text());
       // Accepts an export of this editor, or a plain project.json of the local editor
       const next = data.project ?? data;
       if (!Array.isArray(next?.novels)) throw new Error("this file is not a KITEditor project");
